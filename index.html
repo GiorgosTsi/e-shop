@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giwrghs Shop</title>
+
+    <!-- font_awesome link through cdn-->
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    <!--custom css-->
+    <link rel="stylesheet" href="styles.css">
+
+</head>
+<body>
+    <!-- navbar -->
+     <nav class="navbar">
+        <div class="navbar-center">
+            <span class="nav-icon">
+                <i class="fa fa-bars"></i>
+            </span> 
+            <img src="images/logo.svg" alt="store logo">
+            <div class="cart-btn">
+                <span class="nav-icon">
+                    <i class="fa fa-cart-plus"></i>
+                </span>
+                <div class="cart-items">0</div>
+            </div>
+        </div>
+     </nav>
+    <!-- end of navbar -->
+
+    <!-- hero section -->
+     <header class="hero">
+        <div class="banner">
+            <h1 class="banner-title">laptop collection</h1>
+            <button class="banner-btn">shop now</button>
+        </div>
+     </header>
+
+    <!-- products(initially its gonna be hardcoded)-->
+     <section class="products">
+        <div class="section-title">
+            <h2>our products</h2>
+        </div>
+
+        <div class="products-center">
+             <!-- single product-->
+             <article class="product">
+                <div class="img-container">
+                    <img src="./images/prod3.jpg" alt="product" class="product-img">
+                    <button class="bag-btn" data-id="1">
+                        <i class="fa fa-shopping-cart"></i>
+                        add to bag
+                    </button>
+                </div>
+                <h3 >Macbook Air M3</h3>
+                <h4>1400$</h4>
+            </article>
+            
+            <!-- single product-->
+            <article class="product">
+                <div class="img-container">
+                    <img src="./images/prod1.jpeg" alt="product" class="product-img">
+                    <button class="bag-btn" data-id="1">
+                        <i class="fa fa-shopping-cart"></i>
+                        add to bag
+                    </button>
+                </div>
+                <h3 >Macbook Air M1</h3>
+                <h4>1200$</h4>
+            </article>
+
+            <!-- single product-->
+            <article class="product">
+                <div class="img-container">
+                    <img src="./images/prod2.jpg" alt="product" class="product-img">
+                    <button class="bag-btn" data-id="1">
+                        <i class="fa fa-shopping-cart"></i>
+                        add to bag
+                    </button>
+                </div>
+                <h3 >Macbook Air M2</h3>
+                <h4>1300$</h4>
+            </article>
+
+           
+        </div>
+     </section>
+     
+    <script src="app.js"></script>
+</body>
+</html>
