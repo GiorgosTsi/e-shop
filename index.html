@@ -37,17 +37,17 @@
         </div>
      </header>
 
-    <!-- products(initially its gonna be hardcoded)-->
+    <!-- products(initially its gonna be hardcoded , then we add it via js)-->
      <section class="products">
         <div class="section-title">
             <h2>our products</h2>
         </div>
 
         <div class="products-center">
-             <!-- single product-->
+             <!-- single product( example given below.ALl the products are added through js)-->
              <article class="product">
                 <div class="img-container">
-                    <img src="./images/prod3.jpg" alt="product" class="product-img">
+                    <img src="./images/prod1.jpeg" alt="product" class="product-img">
                     <button class="bag-btn" data-id="1">
                         <i class="fa fa-shopping-cart"></i>
                         add to bag
@@ -56,36 +56,44 @@
                 <h3 >Macbook Air M3</h3>
                 <h4>1400$</h4>
             </article>
-            
-            <!-- single product-->
-            <article class="product">
-                <div class="img-container">
-                    <img src="./images/prod1.jpeg" alt="product" class="product-img">
-                    <button class="bag-btn" data-id="1">
-                        <i class="fa fa-shopping-cart"></i>
-                        add to bag
-                    </button>
-                </div>
-                <h3 >Macbook Air M1</h3>
-                <h4>1200$</h4>
-            </article>
-
-            <!-- single product-->
-            <article class="product">
-                <div class="img-container">
-                    <img src="./images/prod2.jpg" alt="product" class="product-img">
-                    <button class="bag-btn" data-id="1">
-                        <i class="fa fa-shopping-cart"></i>
-                        add to bag
-                    </button>
-                </div>
-                <h3 >Macbook Air M2</h3>
-                <h4>1300$</h4>
-            </article>
-
+            <!-- end of single product-->
            
         </div>
      </section>
+
+     <!-- cart section-->
+      <div class="cart-overlay">
+        <div class="cart">
+            <span class="close-cart">
+                <i class="fa fa-window-close"></i>
+            </span>
+            <h2>your cart</h2>
+            <div class="cart-content">
+                <!-- cart item hardcoded-->
+                 <div class="cart-item">
+                    <img src="./images/prod1.jpeg" alt="product">
+                    <div>
+                        <h4>Macbook Air M1</h4>
+                        <h5>1200$</h5>
+                        <span class="remove-item">Remove</span>
+                    </div>
+                    <div>
+                        <i class="fa fa-chevron-up"></i>
+                        <p class="item-amount">1</p>
+                        <i class="fa fa-chevron-down"></i>
+                    </div>
+                 </div>
+
+                 <!-- end of cart item-->
+            </div>
+
+            <!-- cart footer -->
+             <div class="cart-footer">
+                <h3>Your total: $ <span class="cart-total">0</span></h3>
+                <button class="clear-cart banner-btn">Clear cart</button>
+             </div>
+        </div>
+      </div>
      
     <script src="app.js"></script>
 </body>
