@@ -193,6 +193,63 @@ class UI {
         */
         //clearCartBtn.addEventListener('click',this.clearCart);
         clearCartBtn.addEventListener('click',() => { this.clearCart(); });
+
+        //add event listener for remove, increase , decrease buttons
+        //we are gonna use bubble listener.Listener for the whole cart content.
+        cartContent.addEventListener('click' , event=>{
+            
+            // if remove button is pressed:
+            if(event.target.classList.contains('remove-item')){
+                let removeItem = event.target;
+                let id = removeItem.dataset.id;
+
+                //remove item from the cart(local storage and DOM also!)
+                this.removeItem(id);
+            }
+            //if increase button is pressed:
+            else if(event.target.classList.contains('fa-chevron-up')){
+                let addBtn = event.target;
+                let id = addBtn.dataset.id;
+
+                //increase the amount of product in the cart list
+                let tempItem = cart.find( item => item.id === id);//find item with id
+                tempItem.amount = tempItem.amount + 1 ; //this changes the amount of the item INSIDE the cart list.So it changes the cart list
+
+                //save the new cart list in the local storage
+                Storage.saveCart(cart);
+
+                //update the cart values
+                this.setCartValues(cart);
+
+                //also update the value item-amount in DOM
+                // class item-amount object is sibling of chevron up object
+                addBtn.nextElementSibling.innerText = tempItem.amount;
+            }
+            else if(event.target.classList.contains('fa-chevron-down')){
+                let decBtn = event.target;
+                let id = decBtn.dataset.id;
+
+                //decrease the amount of product in the cart list
+                let tempItem = cart.find( item => item.id === id);//find item with id
+                tempItem.amount = tempItem.amount - 1 ;
+                
+                //if amount = 0 we need to remove it from cart
+                if( tempItem.amount == 0){
+                    this.removeItem(id);
+                }
+                else{
+                    //save the new cart list in the local storage
+                    Storage.saveCart(cart);
+
+                    //update the cart values
+                    this.setCartValues(cart);
+
+                    //also update the value item-amount in DOM
+                    // class item-amount object is sibling of chevron up object
+                    decBtn.previousElementSibling.innerText = tempItem.amount;
+                }
+            }
+        });
     }
 
     clearCart(){
@@ -200,18 +257,32 @@ class UI {
         cartItems.forEach( itemID => {
             this.removeItem(itemID);
         });
-        while( cartContent.children.length > 0){
+       /* while( cartContent.children.length > 0){
             cartContent.removeChild(cartContent.children[0]);
         }
         this.hideCart();
-
+        */
     }
 
     removeItem(id){
         cart = cart.filter( item => item.id !== id); // keep only the items that satisfy the predicate
         
         //remove also the item from cart Content DOM
-        //cartContent.removeChild()
+        
+        // Find the item element in the cartContent DOM by data-id
+        //Note that the cart-item is the grandparent of the item with the given data-id
+        //so we need to climb up two parent nodes and delete this item, to delete the item from the DOM
+        const itemElement = cartContent.querySelector(`[data-id="${id}"]`);
+        
+        if (itemElement) {
+            // Traverse up to the grandparent (parent of parent)
+            const parentElement = itemElement.parentElement.parentElement;
+    
+            // Remove the parent element from cartContent
+            cartContent.removeChild(parentElement);
+        } else {
+            console.log(`Item with id ${id} not found in cartContent`);
+        }
         //store the new cart list in local storage:
         Storage.saveCart(cart);
 
