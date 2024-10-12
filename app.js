@@ -11,6 +11,7 @@ const cartContent = document.querySelector('.cart-content');
 const productsDOM = document.querySelector('.products-center');
 
 let cart = [] // main cart array!
+let buttonsDOM = []
 
 //getting products class
 class Products{
@@ -25,7 +26,7 @@ class Products{
 
             products = products.map(item =>{
                 const {title,price} = item.fields;
-                const id = item.sys
+                const {id} = item.sys
                 const image = item.fields.image.fields.file.url;
                 return {title,price,id,image}
             })
@@ -66,11 +67,111 @@ class UI {
         //all the above should be placed inside product center dom
         productsDOM.innerHTML = resultHTML;
     }
+
+    getBagButtons(){
+        const btns = [...document.querySelectorAll(".bag-btn")];//get an array of bag btns
+        buttonsDOM = btns;
+
+        //add event listener to every button
+        btns.forEach(button => {
+            let id = button.dataset.id;
+            let inCart = cart.find(item => item.id === id);
+            if(inCart){
+                button.innerText = "In Cart";
+                button.disable = true;
+            }
+            
+            button.addEventListener('click',(event)=>{
+                //if the add to cart button is pressed:
+
+                /*1) Display that its added in cart */
+                event.target.innerText = "In Cart";
+                event.target.disabled = true;
+
+                /*2) Add the product to the cart list(get the prod from localstorage using id) */
+                let cartItem = {...Storage.getProduct(id) , amount: 1}; //add also amount to this product
+                cart = [...cart,cartItem]; // append the product to the cart array
+            
+                /*3) Save the updated cart in local storage, so its visible after reload the page */
+                Storage.saveCart(cart);
+
+                /*4) Set cart values in cart icon and total Value*/
+                this.setCartValues(cart);
+
+                /*5) Update(add html) and Display cart content UI*/
+                this.updateCartContent(cartItem);
+                this.showCart();
+
+            })
+            
+         })
+    }
+
+
+    setCartValues(cart){
+        
+        //cart.map(item => {
+        //    tempTotal += item.price * item.amount;
+        //    itemsTotal += item.amount;
+        //});
+
+        let totalMoney = cart.reduce( (acc , item ) => {
+            return acc + item.price * item.amount ;
+        } , 0); // 0 is the initial value for the accumulator
+        cartTotal.innerText = parseFloat(totalMoney.toFixed(2)); // keep only 2 decimals from total and make it float again from string
+        
+        let itemsTotal = cart.reduce( (acc , item) => {return item.amount + acc ;} , 0);
+        cartItems.innerText = itemsTotal;
+    }
+
+    updateCartContent(item){
+        const div = document.createElement('div');
+        div.classList.add('cart-item');
+        div.innerHTML = ` <img src=${item.image} alt="product">
+                    <div>
+                        <h4>${item.title}</h4>
+                        <h5>${item.price}$</h5>
+                        <span class="remove-item" data-id=${item.id}>Remove</span>
+                    </div>
+                    <div>
+                        <i class="fa fa-chevron-up" data-id=${item.id}></i>
+                        <p class="item-amount">${item.amount}</p>
+                        <i class="fa fa-chevron-down" data-id=${item.id}></i>
+                    </div>`;
+
+        cartContent.appendChild(div);
+    }
+
+    showCart(){
+        //to make visible the cart just change visibility to cart overlay
+        cartOverlay.classList.add('transparentBcg');//transparentBcg cart just make visibility to visible
+        cartDOM.classList.add('showCart')
+    }
+
+    setupAPP(){
+        
+    }
 }
 
-//local storage class
+/*local storage class
+* Users data and orders are gonna be stored in Local Storage of the browser.
+* You can also use cookies..
+*/
 class Storage{
 
+    static saveProducts(products){
+        /*Take as parameter the products array */
+        localStorage.setItem("products",JSON.stringify(products));
+    }
+
+    static getProduct(id){
+        let products = JSON.parse(localStorage.getItem('products'));
+        return products.find(product => product.id === id);
+    }
+
+    static saveCart(cart){
+        localStorage.setItem('cart',JSON.stringify(cart));
+    }
 }
 
 
@@ -80,6 +181,18 @@ document.addEventListener("DOMContentLoaded" , ()=>{
     const ui = new UI();
     const products = new Products();
 
-    //get all products from json.
-    products.getProducts().then(products => ui.displayProducts(products));
-})
+    //get all products from json and then display them in main page.
+    products.getProducts().then(products => {
+        ui.displayProducts(products);
+
+        //Store products in local storage.
+        Storage.saveProducts(products);
+    }
+    ).then(()=>{
+        ui.getBagButtons()
+
+    });
+
+    
+    
+});
