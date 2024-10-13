@@ -1,0 +1,53 @@
+{
+    "items": [
+      {
+        "id": "1",
+        "title": "Macbook Air M1",
+        "price": 1100,
+        "image": "./images/prod1.jpeg"
+      },
+      {
+        "id": "2",
+        "title": "Macbook Air M2",
+        "price": 1300,
+        "image": "./images/prod2.jpg"
+      },
+      {
+        "id": "3",
+        "title": "Macbook Air M3",
+        "price": 1400,
+        "image": "./images/prod3.jpg"
+      },
+      {
+        "id": "4",
+        "title": "Lenovo IdeaPad",
+        "price": 500,
+        "image": "./images/prod4.jpg"
+      },
+      {
+        "id": "5",
+        "title": "Lenovo ThinkPad",
+        "price": 890,
+        "image": "./images/prod5.png"
+      },
+      {
+        "id": "6",
+        "title": "HP proBook",
+        "price": 1000,
+        "image": "./images/prod6.jpg"
+      },
+      {
+        "id": "7",
+        "title": "MSI noteBook",
+        "price": 1300,
+        "image": "./images/prod7.jpg"
+      },
+      {
+        "id": "8",
+        "title": "MSI gaming laptop",
+        "price": 2000,
+        "image": "./images/prod8.jpg"
+      }
+    ]
+  }
+  

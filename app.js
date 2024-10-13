@@ -1,4 +1,4 @@
-//variables
+// Global variables
 
 const cartBtn = document.querySelector('.cart-btn');
 const closeCartBtn = document.querySelector('.close-cart');
@@ -9,6 +9,8 @@ const cartItems = document.querySelector('.cart-items');
 const cartTotal = document.querySelector('.cart-total');
 const cartContent = document.querySelector('.cart-content');
 const productsDOM = document.querySelector('.products-center');
+const bannerBtn = document.querySelector('.banner-btn');
+const prodSection = document.querySelector('.products');
 
 let cart = [] // main cart array!
 let buttonsDOM = []
@@ -20,16 +22,24 @@ class Products{
       to a {title,price,id,image} form */
     async getProducts(){
         try{
-            let result= await fetch('products.json');
+            let result= await fetch('products2.json');
             let data = await result.json()
-            let products = data.items;
+            let products = data.items; // get the products list of json object
 
+            // for products.json with nested fields:
+            /*
             products = products.map(item =>{
                 const {title,price} = item.fields;
                 const {id} = item.sys
                 const image = item.fields.image.fields.file.url;
                 return {title,price,id,image}
-            })
+            })*/
+           products = products.map( item => {
+            const { id, title, price, image } = item;
+            return {title,price,id,image};
+           });
+           //console.log(products);
+
             return products;
         } catch(error){
             console.log(error); // if data not in json
@@ -336,6 +346,16 @@ document.addEventListener("DOMContentLoaded" , ()=>{
     /*setupAPP method is used, if cart content in stored in local storage,to setup the app */
     ui.setupAPP();
 
+    /* add event listener to the shop now hero button */
+    bannerBtn.addEventListener('click', (e) => {
+        e.preventDefault(); // Prevent default anchor behavior
+      
+        // Smooth scroll to the products section
+        prodSection.scrollIntoView({
+          behavior: 'smooth'
+        });
+      });
+      
     //get all products from json and then display them in main page.
     products.getProducts().then(products => {
         ui.displayProducts(products);
