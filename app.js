@@ -35,8 +35,8 @@ class Products{
                 return {title,price,id,image}
             })*/
            products = products.map( item => {
-            const { id, title, price, image } = item;
-            return {title,price,id,image};
+            const { id, title, price, image ,quantity } = item;
+            return {title,price,id,image,quantity};
            });
            //console.log(products);
 
@@ -69,6 +69,9 @@ class UI {
                 </div>
                 <h3 >${product.title}</h3>
                 <h4>${product.price}$</h4>
+                <div class="quantity">
+                    Quantity: <span>${product.quantity}</span>
+                </div>
             </article>
             <!-- end of single product-->
             `
@@ -91,8 +94,29 @@ class UI {
                 button.disable = true;
             }
             
+            if( Storage.getProductQuantity(id) <= 0){
+                button.innerText = "Out Of Stock";
+                button.disable = true;
+            }
+
             button.addEventListener('click',(event)=>{
                 //if the add to cart button is pressed:
+                
+                let quantity = Storage.getProductQuantity(id);
+                
+                //redundant if because its not clickable anymore
+                if ( quantity <= 0){
+                    console.log(quantity);
+                    console.log("Out of stock");
+                    event.target.innerText = "Out Of Stock";
+                    event.target.disabled = true;
+                    return;
+                }
+
+                // the product is in stock:
+
+                /*0) Decrease quantity both in DOM and products local storage */
+                this.updateQuantity(id,-1);
 
                 /*1) Display that its added in cart */
                 event.target.innerText = "In Cart";
@@ -117,6 +141,42 @@ class UI {
          })
     }
 
+    updateQuantity(id, amount) {
+        // 1) Update the quantity in the local storage
+        
+
+        // Retrieve products from localStorage
+        const products = JSON.parse(localStorage.getItem('products'));
+        const productIndex = products.findIndex(product => product.id === id);
+        
+        if (productIndex !== -1) {
+            // Update the quantity (increase or decrease based on the amount parameter)
+            products[productIndex].quantity += amount;
+    
+            // Ensure quantity doesn't fall below 0
+            if (products[productIndex].quantity < 0) {
+                products[productIndex].quantity = 0;
+            }
+    
+            // Save the updated products array to localStorage
+            localStorage.setItem('products', JSON.stringify(products));
+        }
+    
+        // 2) Update the quantity DOM element visually:
+    
+        // Locate the product element with the given id
+        const productElement = document.querySelector(`[data-id="${id}"]`).closest('.product');
+    
+        if (productElement) {
+            // Locate the quantity span element in the product card
+            const quantityElement = productElement.querySelector('.quantity span');
+            
+            // Update the displayed quantity
+            if (quantityElement) {
+                quantityElement.innerText = products[productIndex].quantity; // Update the displayed quantity
+            }
+        }
+    }
 
     setCartValues(cart){
         
@@ -322,9 +382,21 @@ class Storage{
         localStorage.setItem("products",JSON.stringify(products));
     }
 
+    static getProducts(){
+        return localStorage.getItem('products') ? JSON.parse(localStorage.getItem('products')) : [];
+
+    }
     static getProduct(id){
         let products = JSON.parse(localStorage.getItem('products'));
-        return products.find(product => product.id === id);
+        let product =  products.find(product => product.id === id);
+        const { quantity, ...productWithoutQuantity } = product; // Destructure and exclude "quantity"
+        return productWithoutQuantity; // Return the modified object
+    }
+
+    static getProductQuantity(id){
+        let products = JSON.parse(localStorage.getItem('products'));
+        let product =  products.find(product => product.id === id);
+        return product.quantity;
     }
 
     static saveCart(cart){
@@ -341,9 +413,9 @@ class Storage{
 document.addEventListener("DOMContentLoaded" , ()=>{
 
     const ui = new UI();
-    const products = new Products();
+    //const products = new Products();
 
-    /*setupAPP method is used, if cart content in stored in local storage,to setup the app */
+    /*setupAPP method is used, if cart content is stored in local storage,to setup the app */
     ui.setupAPP();
 
     /* add event listener to the shop now hero button */
@@ -354,23 +426,32 @@ document.addEventListener("DOMContentLoaded" , ()=>{
         prodSection.scrollIntoView({
           behavior: 'smooth'
         });
-      });
-      
-    //get all products from json and then display them in main page.
-    products.getProducts().then(products => {
-        ui.displayProducts(products);
-
-        //Store products in local storage.
-        Storage.saveProducts(products);
-    }
-    ).then(()=>{
-        ui.getBagButtons();
-
-        //add event listeners to cart buttons
-        ui.cartLogic();
-
     });
+    
+    /*If products exist in local storage, it means
+      that we have quantities modified , so we need to 
+      load this array on reload and not the json file.
+    */
+    let products = Storage.getProducts();
 
-    
-    
+    if (products.length === 0) {
+      // If no products in storage, fetch from Products class (which returns a promise)
+      products = (new Products()).getProducts();
+      products.then(products => {
+        ui.displayProducts(products);
+        
+        // Store products in local storage
+        Storage.saveProducts(products);
+        }).then(() => {
+              ui.getBagButtons();
+              ui.cartLogic();
+          });
+    } else {
+        // If products are already in local storage
+        ui.displayProducts(products);
+      
+        // Call methods directly without waiting for a Promise
+        ui.getBagButtons();
+        ui.cartLogic();
+      }
 });

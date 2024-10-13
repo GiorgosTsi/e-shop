@@ -140,6 +140,13 @@ body {
   .bag-btn:hover {
     color: var(--mainWhite);
   }
+
+  
+  /*Start of quantity */
+  
+
+
+  /*End of quantity */
   .fa-shopping-cart {
     margin-right: 0.5rem;
   }
