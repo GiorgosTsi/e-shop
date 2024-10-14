@@ -283,7 +283,13 @@ class UI {
 
                 //increase the amount of product in the cart list
                 let tempItem = cart.find( item => item.id === id);//find item with id
+
+                if(Storage.getProductQuantity(id) < 1){
+                    return;
+                }
                 tempItem.amount = tempItem.amount + 1 ; //this changes the amount of the item INSIDE the cart list.So it changes the cart list
+
+                this.updateQuantity(id , -1);
 
                 //save the new cart list in the local storage
                 Storage.saveCart(cart);
@@ -299,20 +305,27 @@ class UI {
                 let decBtn = event.target;
                 let id = decBtn.dataset.id;
 
-                //decrease the amount of product in the cart list
                 let tempItem = cart.find( item => item.id === id);//find item with id
-                tempItem.amount = tempItem.amount - 1 ;
                 
-                //if amount = 0 we need to remove it from cart
-                if( tempItem.amount == 0){
+                
+                //if amount = 1 we need to remove it from cart
+                if( tempItem.amount === 1){
+                    console.log("item need to be removed");
                     this.removeItem(id);
                 }
+
                 else{
+                    //update the amount of product in the cart:
+                    tempItem.amount = tempItem.amount - 1 ;
+
                     //save the new cart list in the local storage
                     Storage.saveCart(cart);
 
                     //update the cart values
                     this.setCartValues(cart);
+
+                    //update(increase) the quantity of product
+                    this.updateQuantity(id , 1);
 
                     //also update the value item-amount in DOM
                     // class item-amount object is sibling of chevron up object
@@ -327,17 +340,15 @@ class UI {
         cartItems.forEach( itemID => {
             this.removeItem(itemID);
         });
-       /* while( cartContent.children.length > 0){
-            cartContent.removeChild(cartContent.children[0]);
-        }
-        this.hideCart();
-        */
     }
 
     removeItem(id){
+        let productAmountToRemove = cart.filter( item => item.id === id)[0].amount;
+
+        /*1) Remove item from the cart */
         cart = cart.filter( item => item.id !== id); // keep only the items that satisfy the predicate
         
-        //remove also the item from cart Content DOM
+        /*2) Remove also the item from cart Content DOM */
         
         // Find the item element in the cartContent DOM by data-id
         //Note that the cart-item is the grandparent of the item with the given data-id
@@ -353,16 +364,23 @@ class UI {
         } else {
             console.log(`Item with id ${id} not found in cartContent`);
         }
-        //store the new cart list in local storage:
+
+        /*3) Store the new cart list in local storage: */
         Storage.saveCart(cart);
 
-        //reset the add to cart button of this item:
+        /*4) Reset the add to cart button of this item: */
+
         let button = this.getSingleButton(id);
         button.disabled = false;
         button.innerHTML = `<i class="fa fa-shopping-cart"></i>add to cart`;
 
-        //update total value in cart
+        /*5) Update total value in cart */
         this.setCartValues(cart); //set again #items and total cost.
+
+        /*6) Reset the quantity of this product: */
+
+        this.updateQuantity(id , productAmountToRemove); // updates both dom and local storage
+
     }
 
     getSingleButton(id){
