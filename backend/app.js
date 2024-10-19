@@ -29,3 +29,47 @@ app.use(cors());
 const productsDbService = require('./productsDatabaseService');
 const pdb = productsDbService.getDbServiceInstance();
 pdb.initialize() //initialize products table
+
+
+
+/******************************* CREATE ENDPOINTS-ROUTES *************************/
+
+//get all products
+app.get('/products', async (req, res) => {
+    console.log('get all products request');
+    try {
+        const allData = await pdb.getAllData(); // Call the method to fetch all data
+        res.status(200).json(allData);
+        //console.log(allData);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to retrieve data' });
+    }
+
+});
+
+
+//insert new product
+app.post('/products' , (req,resp) => {
+    console.log('insert request');
+    const { title , price , image , quantity } = req.body; 
+    console.log(title);
+    pdb.insertNewProduct(title , price , image , quantity)
+        .then(result => {
+            resp.status(201).json({
+                message: "Data inserted successfully",
+                data: result
+            });
+        })
+        .catch(err => {
+            console.error(err);
+            resp.status(500).json({
+                message: "Error inserting data",
+                error: err
+            });
+        }); 
+});
+
+
+
+/******************************* INITIALIZE APP , TO LISTEN ON 5000 PORT *************************/
+app.listen(process.env.PORT , () => console.log("app is running"));

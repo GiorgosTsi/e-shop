@@ -1,5 +1,7 @@
 version: '3.8'
 
+## USE docker compose down -v to remove and reset any volume-network(reset your db)
+
 services:
   products_db:
     image: postgres:latest
