@@ -32,7 +32,7 @@ pdb.initialize() //initialize products table
 
 
 
-/************************************************************** CREATE ENDPOINTS-ROUTES **************************************************************/
+/************************************************************** CREATE ENDPOINTS-ROUTES FOR PRODUCTS DB **************************************************************/
 
 /* 1) Get all products */
 app.get('/products', async (req, res) => {

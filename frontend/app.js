@@ -1,5 +1,6 @@
 // Global variables
 
+const menuBtn = document.querySelector('.cart-btn');
 const cartBtn = document.querySelector('.cart-btn');
 const closeCartBtn = document.querySelector('.close-cart');
 const clearCartBtn = document.querySelector('.clear-cart');
@@ -18,27 +19,22 @@ let buttonsDOM = []
 //getting products class
 class Products{
 
-    /*Load all the products from the json file and return them
-      to a {title,price,id,image} form */
+    /*Load all the products from the database and return them
+      to a {title,price,id,image,quantity} form */
     async getProducts(){
         try{
-            let result= await fetch('products2.json');
-            let data = await result.json()
-            let products = data.items; // get the products list of json object
+            //let result= await fetch('products2.json');
+            let result = await fetch('http://localhost:5000/products'); // by default it's a GET request
+            let products = await result.json();
+           
+            //let products = data.items; // get the products list of json object // doesnt need anymore on real fetch call
 
-            // for products.json with nested fields:
-            /*
-            products = products.map(item =>{
-                const {title,price} = item.fields;
-                const {id} = item.sys
-                const image = item.fields.image.fields.file.url;
-                return {title,price,id,image}
-            })*/
            products = products.map( item => {
-            const { id, title, price, image ,quantity } = item;
+            let { id, title, price, image ,quantity } = item;
+            id = id.toString(); // convert product id from int to string so you can compare it with DOM id in the html code which is in string format!!
             return {title,price,id,image,quantity};
            });
-           //console.log(products);
+           console.log(products);
 
             return products;
         } catch(error){
@@ -413,7 +409,7 @@ class Storage{
 
     static getProductQuantity(id){
         let products = JSON.parse(localStorage.getItem('products'));
-        let product =  products.find(product => product.id === id);
+        let product =  products.find(product => product.id === (id));
         return product.quantity;
     }
 
