@@ -111,52 +111,88 @@ class DbService {
         }
     }
 
-    // 3. Delete a record by ID from 'names' table
+    // 3. Delete a record by ID from 'products' table
     async deleteById(id) {
         try {
             const res = await client.query(
-                'DELETE FROM names WHERE id = $1 RETURNING *',
+                'DELETE FROM products WHERE id = $1 RETURNING *',
                 [id]
             );
             return res.rowCount > 0 ? res.rows[0] : null;
         } catch (error) {
-            console.log("Error deleting data", error);
+            console.log("Error deleting product", error);
             throw error;
         }
     }
 
-    // 4. Update a record by ID in 'names' table
-    async updateById(id, newName) {
+    // 4. Update a record by ID in 'products' table
+    async updateProduct(id, updates) {
         try {
-            const res = await client.query(
-                'UPDATE names SET name = $1 WHERE id = $2 RETURNING *',
-                [newName, id]
-            );
-            return res.rows[0];
+            // Destructure the updates object to get the fields that need to be updated
+            const { title, price, quantity, image } = updates;
+
+            // Build the query dynamically based on which fields are provided
+            let updateFields = [];
+            let values = [];
+
+            if (title) {
+                updateFields.push('title = $' + (values.length + 1));
+                values.push(title);
+            }
+            if (price) {
+                updateFields.push('price = $' + (values.length + 1));
+                values.push(price);
+            }
+            if (quantity) {
+                updateFields.push('quantity = $' + (values.length + 1));
+                values.push(quantity);
+            }
+            if (image) {
+                updateFields.push('image = $' + (values.length + 1));
+                values.push(image);
+            }
+
+            // If there are no fields to update, return an error
+            if (updateFields.length === 0) {
+                throw new Error('No valid fields provided for update.');
+            }
+
+            // Add the ID to the values array and build the final query
+            const query = `UPDATE products SET ${updateFields.join(', ')} WHERE id = $${values.length + 1} RETURNING *`;
+            values.push(id); // Add product ID as the last value
+
+            // Execute the query and return the updated row
+            const result = await client.query(query, values);
+
+            if (result.rowCount === 0) {
+                throw new Error('Product not found.');
+            }
+
+            return result.rows[0]; // Return the updated product
         } catch (error) {
-            console.log("Error updating data", error);
-            throw error;
+            console.error('Error updating product', error);
+            throw error; // Re-throw the error to be handled by the route
         }
     }
 
     // 5. Get a specific record by ID
     async getById(id) {
         try {
-            const res = await client.query('SELECT * FROM names WHERE id = $1', [id]);
+            const res = await client.query('SELECT * FROM products WHERE id = $1', [id]);
             return res.rows.length ? res.rows[0] : null;
         } catch (error) {
-            console.log("Error fetching data by ID", error);
+            console.log("Error fetching product by ID", error);
             throw error;
         }
     }
 
-    // 6. Get a specific record(s) by name
-    async getByName(name) {
+    // 6. Get record(s) by title
+    async getByTitle(title) {
         try {
-            const res = await client.query('SELECT * FROM names WHERE name = $1', [name]);
-            return res.rows.length ? res.rows[0] : "";
+            const res = await client.query('SELECT * FROM products WHERE title = $1', [title]);
+            return res.rows.length ? res.rows[0] : null;
         } catch (error) {
-            console.log("Error fetching data by name", error);
+            console.log("Error fetching products by title", error);
             throw error;
         }
     }
