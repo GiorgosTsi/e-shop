@@ -275,3 +275,73 @@ body {
 }
 
 /* --------------- End of Cart ---------------- */
+
+/* --------------- Sidebar ---------------- */
+/* Sidebar overlay styling */
+.sidebar-overlay {
+  position: fixed;  /* Make the overlay fill the entire viewport */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgb(240, 157, 81, 0.5);  /* Semi-transparent background */
+  visibility: hidden; 
+  z-index: 2;
+  transition: var(--mainTransition);
+}
+
+/* Sidebar itself */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 300px;  /* Adjust the width as needed */
+  height: 100%;
+  background: rgb(231, 226, 221);  /* White background for the sidebar */
+  padding: 1rem;
+  transform: translateX(-100%);  /* Hide the sidebar initially */
+  transition: var(--mainTransition);
+  z-index: 3;  /* Ensure it's on top of the overlay */
+}
+
+/* Show sidebar when the menu icon is clicked */
+.showOverlay {
+  visibility: visible;
+}
+
+.showSidebar {
+  transform: translateX(0);  /* Slide the sidebar into view */
+}
+
+/* Close button for the sidebar */
+.close-sidebar {
+  font-size: 1.7rem;
+  cursor: pointer;
+  display: block;
+  text-align: right;
+}
+
+/* Sidebar menu styling */
+.sidebar-menu {
+  list-style-type: none;
+  margin-top: 2rem;
+}
+
+.sidebar-menu li {
+  margin-bottom: 1.5rem;
+}
+
+.sidebar-menu li a {
+  text-transform: capitalize;
+  font-size: 1.2rem;
+  color: var(--mainBlack);
+  text-decoration: none;
+  transition: var(--mainTransition);
+}
+
+.sidebar-menu li a:hover {
+  color: var(--primaryColor);
+}
+
+
+/* --------------- End of Sidebar ---------------- */

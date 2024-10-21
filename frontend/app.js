@@ -1,6 +1,10 @@
 // Global variables
 
-const menuBtn = document.querySelector('.cart-btn');
+const sidebarBtn = document.querySelector('.menu-icon');
+const closeSidebarBtn = document.querySelector('.close-sidebar');
+const sidebarOverlay = document.querySelector('.sidebar-overlay');
+const sidebarDOM = document.querySelector('.sidebar');
+
 const cartBtn = document.querySelector('.cart-btn');
 const closeCartBtn = document.querySelector('.close-cart');
 const clearCartBtn = document.querySelector('.clear-cart');
@@ -214,12 +218,40 @@ class UI {
         cartDOM.classList.add('showCart');
     }
 
+    showSidebar(){
+        //to make visible the cart just change visibility to cart overlay
+        sidebarOverlay.classList.add('showOverlay');
+        sidebarDOM.classList.add('showSidebar');
+    }
+
     setupAPP(){
         /*Method to be used when the dom is loaded.
+        * This method setups all the ui , including cart-storage.
         * Get the cart from the local storage if it exists,
         * so the items in the cart will not dissapear when page is reloaded.
+        * Also declares event listeners.
         */
         //
+        /* add event listener to the shop now hero button */
+        bannerBtn.addEventListener('click', (e) => {
+            e.preventDefault(); // Prevent default anchor behavior
+        
+            // Smooth scroll to the products section
+            prodSection.scrollIntoView({
+            behavior: 'smooth'
+            });
+        });
+
+        // Add event listener for click on "Products" link in menu area
+        const productsLink = document.querySelector(".sidebar-menu li a[href='#Products']");
+        
+        productsLink.addEventListener("click", (event)=> {
+            event.preventDefault(); // Prevent the default anchor link behavior
+            // Smooth scroll to the products section
+            prodSection.scrollIntoView({ behavior: "smooth" });
+            this.hideSidebar();
+        });
+
         cart = Storage.getCart();
         //set the cart values
         this.setCartValues(cart);
@@ -229,12 +261,20 @@ class UI {
         cartBtn.addEventListener('click',this.showCart);
         //add evemt listener to close btn
         closeCartBtn.addEventListener('click',this.hideCart);
-
+        //add event listener to sidebar btn
+        sidebarBtn.addEventListener('click',this.showSidebar);
+        //add evemt listener to close sidebar btn
+        closeSidebarBtn.addEventListener('click',this.hideSidebar);
     }
 
     hideCart(){
         cartOverlay.classList.remove('transparentBcg');
         cartDOM.classList.remove('showCart');
+    }
+
+    hideSidebar(){
+        sidebarOverlay.classList.remove('showOverlay');
+        sidebarDOM.classList.remove('showSidebar');
     }
 
     populateCart(cart){
@@ -432,15 +472,6 @@ document.addEventListener("DOMContentLoaded" , ()=>{
     /*setupAPP method is used, if cart content is stored in local storage,to setup the app */
     ui.setupAPP();
 
-    /* add event listener to the shop now hero button */
-    bannerBtn.addEventListener('click', (e) => {
-        e.preventDefault(); // Prevent default anchor behavior
-      
-        // Smooth scroll to the products section
-        prodSection.scrollIntoView({
-          behavior: 'smooth'
-        });
-    });
     
     /*If products exist in local storage, it means
       that we have quantities modified , so we need to 
