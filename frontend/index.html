@@ -108,12 +108,41 @@
             <h2>Menu</h2>
             <ul class="sidebar-menu">
                 <li><a href="#Products">Products</a></li>
-                <li><a href="#ManageProducts">Manage Products</a></li>
+                <li><a href="#Manage-Products">Manage Products</a></li>
                 <li><a href="#Order">Orders</a></li>
             </ul>
         </div>
     </div>
     <!-- End of sidebar section -->
+
+    <!-- Manage Products Panel -->
+    <div class="manage-products-overlay">
+        <div class="manage-products">
+            <span class="close-manage-products">
+                <i class="fa fa-close"></i>
+            </span>
+            <h2>Manage Products</h2>
+            <div class="manage-products-content">
+                <!-- Add New Product Form -->
+                <form id="addProductForm" enctype="multipart/form-data">
+                    <h3>Add New Product</h3>
+                    <input type="text" id="productTitle" placeholder="Product Title" required />
+                    <input type="text" id="productPrice" placeholder="Product Price" required />
+                    <input type="file" id="productImage" accept="image/*" required/>
+                    <input type="text" id="productQuantity" placeholder="Product Quantity" required />
+                    <button type="submit" class="add-product-btn">Add Product</button>
+                </form>
+
+                <!-- Manage Existing Products (Update/Delete) -->
+                <h3>Manage Existing Products</h3>
+                <div id="productList">
+                    <!-- Dynamically filled with products (for update or delete) -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End of Manage Products Panel -->
+
     <script src="app.js"></script>
 </body>
 </html>

@@ -17,6 +17,13 @@ const productsDOM = document.querySelector('.products-center');
 const bannerBtn = document.querySelector('.banner-btn');
 const prodSection = document.querySelector('.products');
 
+const manageProductsOverlay = document.querySelector(".manage-products-overlay");
+const manageProductsDOM = document.querySelector(".manage-products");
+const closeManageProductsBtn = document.querySelector(".close-manage-products");
+const addProductBtn = document.querySelector(".add-product-btn");
+const addProductForm = document.getElementById('addProductForm');
+
+
 let cart = [] // main cart array!
 let buttonsDOM = []
 
@@ -65,6 +72,9 @@ class UI {
                     <button class="bag-btn" data-id=${product.id}>
                         <i class="fa fa-shopping-cart"></i>
                         add to cart
+                        <div class="quantity">
+                        Quantity: <span>${product.quantity}</span>
+                        </div>
                     </button>
                 </div>
                 <h3 >${product.title}</h3>
@@ -252,6 +262,36 @@ class UI {
             this.hideSidebar();
         });
 
+        const manageProductsLink = document.querySelector(".sidebar-menu li a[href='#Manage-Products']");
+    
+        // Show manage products panel when "Manage Products" is clicked
+        manageProductsLink.addEventListener("click", function(event) {
+            event.preventDefault(); // Prevent default anchor link behavior
+            manageProductsOverlay.classList.add("transparentBcgManage");
+            manageProductsDOM.classList.add("showManageProducts");
+        });
+
+        // Close manage products panel when close button is clicked
+        closeManageProductsBtn.addEventListener("click", function() {
+            manageProductsOverlay.classList.remove("transparentBcgManage");
+            manageProductsDOM.classList.remove("showManageProducts");
+        });
+
+        
+        addProductForm.addEventListener('submit', async (event) => {
+            // Prevent the default form submission (page reload)
+            event.preventDefault();
+            console.log('In forms event list');
+            // Create a new FormData object to capture form fields
+            const formData = new FormData(addProductForm);
+            console.log(formData.entries());
+            // Log the form data for debugging (optional)
+            for (let [key, value] of formData.entries()) {
+                console.log('In event loop');
+                console.log(`${key}: ${value}`);
+            }
+        });
+        
         cart = Storage.getCart();
         //set the cart values
         this.setCartValues(cart);

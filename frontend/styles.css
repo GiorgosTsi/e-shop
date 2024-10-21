@@ -78,7 +78,7 @@ body {
     letter-spacing: var(--mainSpacing);
     margin-bottom: 3rem;
   }
-  .banner-btn {
+  .banner-btn  {
     padding: 1rem 3rem; /* Adjust padding as needed for the size */
     text-transform: uppercase;
     letter-spacing: var(--mainSpacing);
@@ -137,6 +137,8 @@ body {
     transform: translateX(101%);
     cursor: pointer;
   }
+
+
   .bag-btn:hover {
     color: var(--mainWhite);
   }
@@ -144,6 +146,13 @@ body {
   
   /*Start of quantity */
   
+
+  .quantity {
+    margin-left: 10px; /* Space between "Add to bag" and the quantity */
+    font-size: 0.9rem; /* Adjust font size for the quantity */
+    color: black; /* Make the quantity text white to match the button */
+}
+
 
 
   /*End of quantity */
@@ -345,3 +354,106 @@ body {
 
 
 /* --------------- End of Sidebar ---------------- */
+
+/* --------------- Manage Products Panel ---------------- */
+
+.manage-products-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgb(240, 157, 81, 0.5); /* Semi-transparent background */
+  visibility: hidden; /* */
+  z-index: 4;
+  display: flex; /* Center the panel */
+  justify-content: center;
+  align-items: center;
+  transition: var(--mainTransition);
+}
+
+.manage-products {
+  width: 80%; /* Adjust width as needed */
+  max-width: 600px; /* Max width of the panel */
+  background: var(--mainWhite);
+  padding: 2rem;
+  border-radius: 15px; /* Rounded corners */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Subtle shadow for depth */
+  transition: var(--mainTransition);
+  transform: translateY(-200%); /* Hidden above the screen initially */
+  opacity: 0; /* Invisible initially */
+}
+
+.showManageProducts {
+  transform: translateY(0); /* Slide down to the center */
+  opacity: 1; /* Fully visible */
+}
+
+.transparentBcgManage {
+  visibility: visible;
+}
+
+.close-manage-products {
+  font-size: 1.7rem;
+  cursor: pointer;
+  text-align: right;
+  margin-bottom: 1rem;
+}
+
+.manage-products h2 {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.manage-products-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.manage-products-content h3 {
+  margin-bottom: 1rem;
+}
+
+.manage-products-content form input,
+.manage-products-content form button {
+  display: block;
+  width: 100%;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  border-radius: 10px; /* Rounded input and button corners */
+}
+
+.manage-products-content form button {
+  background-color: var(--primaryColor);
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+.manage-products-content form button:hover {
+  background-color: darken(var(--primaryColor), 10%);
+}
+
+.add-product-btn  {
+  padding: 1rem 3rem; /* Adjust padding as needed for the size */
+  text-transform: uppercase;
+  letter-spacing: var(--mainSpacing);
+  font-size: 1rem;
+  background: var(--primaryColor);
+  color: var(--mainBlack);
+  border: 3px solid var(--primaryColor);
+  transition: var(--mainTransition);
+  cursor: pointer;
+  
+  /* Add border-radius for oval shape */
+  border-radius: 50px; /* You can also use 50% for a fully rounded shape */
+}
+
+.add-product-btn:hover {
+  background: transparent;
+  color: var(--primaryColor);
+}
+
+
+/* --------------- End of Manage Products Panel ---------------- */
