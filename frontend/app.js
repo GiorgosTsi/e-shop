@@ -22,6 +22,8 @@ const manageProductsDOM = document.querySelector(".manage-products");
 const closeManageProductsBtn = document.querySelector(".close-manage-products");
 const addProductBtn = document.querySelector(".add-product-btn");
 const addProductForm = document.getElementById('addProductForm');
+const manageProductsLink = document.querySelector(".sidebar-menu li a[href='#Manage-Products']");
+const productsLink = document.querySelector(".sidebar-menu li a[href='#Products']");
 
 
 let cart = [] // main cart array!
@@ -32,7 +34,7 @@ class Products{
 
     /*Load all the products from the database and return them
       to a {title,price,id,image,quantity} form */
-    async getProducts(){
+    static async getProducts(){
         try{
             //let result= await fetch('products2.json');
             let result = await fetch('http://localhost:5000/products'); // by default it's a GET request
@@ -45,13 +47,33 @@ class Products{
             id = id.toString(); // convert product id from int to string so you can compare it with DOM id in the html code which is in string format!!
             return {title,price,id,image,quantity};
            });
-           console.log(products);
 
             return products;
         } catch(error){
             console.log(error); // if data not in json
         }
         
+    }
+
+    static async insertNewProduct(productData){
+        // Insert the product into the database
+        // `productData` should be a json object!
+        try{
+            const response = await fetch('http://localhost:5000/products', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(productData)
+            });
+
+            const result = await response.json();
+            console.log('Product added successfully:', result);
+            return result;
+
+        } catch(error){
+            console.log(error);
+        }
     }
 }
 
@@ -72,9 +94,6 @@ class UI {
                     <button class="bag-btn" data-id=${product.id}>
                         <i class="fa fa-shopping-cart"></i>
                         add to cart
-                        <div class="quantity">
-                        Quantity: <span>${product.quantity}</span>
-                        </div>
                     </button>
                 </div>
                 <h3 >${product.title}</h3>
@@ -241,7 +260,8 @@ class UI {
         * so the items in the cart will not dissapear when page is reloaded.
         * Also declares event listeners.
         */
-        //
+        
+
         /* add event listener to the shop now hero button */
         bannerBtn.addEventListener('click', (e) => {
             e.preventDefault(); // Prevent default anchor behavior
@@ -253,8 +273,6 @@ class UI {
         });
 
         // Add event listener for click on "Products" link in menu area
-        const productsLink = document.querySelector(".sidebar-menu li a[href='#Products']");
-        
         productsLink.addEventListener("click", (event)=> {
             event.preventDefault(); // Prevent the default anchor link behavior
             // Smooth scroll to the products section
@@ -262,7 +280,7 @@ class UI {
             this.hideSidebar();
         });
 
-        const manageProductsLink = document.querySelector(".sidebar-menu li a[href='#Manage-Products']");
+        
     
         // Show manage products panel when "Manage Products" is clicked
         manageProductsLink.addEventListener("click", function(event) {
@@ -277,18 +295,13 @@ class UI {
             manageProductsDOM.classList.remove("showManageProducts");
         });
 
-        
+        // Add event listener to the new product Form on submit
         addProductForm.addEventListener('submit', async (event) => {
-            // Prevent the default form submission (page reload)
             event.preventDefault();
-            console.log('In forms event list');
-            // Create a new FormData object to capture form fields
-            const formData = new FormData(addProductForm);
-            console.log(formData.entries());
-            // Log the form data for debugging (optional)
-            for (let [key, value] of formData.entries()) {
-                console.log('In event loop');
-                console.log(`${key}: ${value}`);
+            try{
+                await this.addNewProduct();
+            } catch{
+                console.error('Error at product Insertion');
             }
         });
         
@@ -463,6 +476,58 @@ class UI {
         /*Get the product add to cart button by id */
         return buttonsDOM.find( button => button.dataset.id === id);
     }
+
+    async addNewProduct(){
+         // Create a new FormData object to handle the image upload
+         const formData = new FormData();
+         const productImage = document.getElementById('productImage').files[0];
+         const productTitle = document.getElementById('productTitle').value;
+         const productPrice = document.getElementById('productPrice').value;
+         const productQuantity = document.getElementById('productQuantity').value;
+
+         // Append the image to the FormData object
+         formData.append('image', productImage);
+        
+         try {
+             // First, upload the image to the backend using the image upload endpoint
+             const uploadResponse = await fetch('http://localhost:5000/upload-image', {
+                 method: 'POST',
+                 body: formData
+             });
+
+             if (!uploadResponse.ok) {
+                 throw new Error('Image upload failed');
+             }
+
+             const uploadData = await uploadResponse.json();
+             const imagePath = uploadData.imagePath; // Assuming the server returns the file path
+
+             // Once the image is uploaded, submit the product details to the main API
+             const productData = {
+                 title: productTitle,
+                 price: productPrice,
+                 image: imagePath, // Use the path of the uploaded image
+                 quantity: productQuantity
+             };
+
+             const result = await Products.insertNewProduct(productData);
+
+             //Add the product to the local storage products var and display them
+             let prods = Storage.getProducts();
+             let {id , title , price , image , quantity} = result.data; 
+             id = id.toString();
+             prods.push({title , price , id , image , quantity });
+             Storage.saveProducts(prods);
+
+             //re-display the products to show the new one also
+             this.displayProducts(prods);
+
+
+         } catch (error) {
+             console.error('Error:', error);
+         }
+
+    }
 }
 
 /*local storage class
@@ -521,7 +586,7 @@ document.addEventListener("DOMContentLoaded" , ()=>{
 
     if (products.length === 0) {
       // If no products in storage, fetch from Products class (which returns a promise)
-      products = (new Products()).getProducts();
+      products = Products.getProducts();
       products.then(products => {
         ui.displayProducts(products);
         

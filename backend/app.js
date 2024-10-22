@@ -18,12 +18,26 @@
 
 const express = require('express');
 const cors = require('cors');
+const multer = require('multer');
+const path = require('path');
 const dotenv = require('dotenv');
 dotenv.config();
 
 const app = express(); //initialize the app
 app.use(express.json());
 app.use(cors());
+
+// Define storage for images using multer
+const storage = multer.diskStorage({
+    destination: path.join(__dirname, '../frontend/images'),  // Adjust the path to store in the correct directory
+    filename: (req, file, cb) => {
+        // Create a unique filename by adding a timestamp
+        cb(null, `${Date.now()}-${file.originalname}`);
+    }
+});
+
+// Initialize multer middleware with the storage configuration
+const upload = multer({ storage: storage });
 
 
 const productsDbService = require('./productsDatabaseService');
@@ -148,6 +162,24 @@ app.delete('/products/:id', async (req, res) => {
     }
 });
 
+
+/************************************************************** CREATE ENDPOINT-ROUTE FOR UPLOADING IMAGE IN THE SERVER **************************************************************/
+// Create a new API endpoint for uploading images
+app.post('/upload-image', upload.single('image'), (req, resp) => {
+    console.log('Image uploading..');
+    if (!req.file) {
+        return resp.status(400).json({ message: 'No file uploaded' });
+    }
+    
+    // Get the file path of the uploaded image
+    const imagePath = `./images/${req.file.filename}`;
+    
+    // Respond with the image path, so the frontend can use it
+    resp.status(200).json({
+        message: "Image uploaded successfully",
+        imagePath: imagePath
+    });
+});
 
 /******************************* INITIALIZE APP , TO LISTEN ON 5000 PORT *************************/
 app.listen(process.env.PORT , () => console.log("app is running"));
