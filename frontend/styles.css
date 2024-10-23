@@ -19,6 +19,10 @@ body {
   background: var(--mainWhite);
   font-family: "Lato", sans-serif;
 }
+/* Prevent body from scrolling when modal is open */
+body.no-scroll {
+  overflow: hidden;
+}
 
 /* --------------- Navbar ---------------- */
 .navbar {
@@ -381,6 +385,10 @@ body {
   transition: var(--mainTransition);
   transform: translateY(-200%); /* Hidden above the screen initially */
   opacity: 0; /* Invisible initially */
+  max-height: 80vh; /* Restrict height to allow scrolling */
+  overflow-y: auto; /* Enable vertical scrolling if content exceeds height */
+  position: relative;
+
 }
 
 .showManageProducts {
@@ -454,5 +462,67 @@ body {
   color: var(--primaryColor);
 }
 
+.product-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 10px;
+}
 
+.product-image {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-right: 10px;
+}
+
+.product-details {
+  display: flex;
+  align-items: center;
+}
+
+.product-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.manage-btn {
+  padding: 0.5rem 1rem; /* Adjust padding for size */
+  background-color: var(--primaryColor); /* Use the primary color */
+  color: var(--mainWhite); /* White text */
+  text-transform: uppercase; /* Capitalized text */
+  letter-spacing: var(--mainSpacing); /* Add spacing */
+  font-size: 0.85rem; /* Slightly smaller than main buttons */
+  border: none;
+  cursor: pointer;
+  transition: var(--mainTransition);
+  border-radius: 5px; /* Rounded corners */
+  margin-right: 5px; /* Space between buttons */
+}
+
+/* Hover effects */
+.manage-btn:hover {
+  background-color: transparent;
+  color: var(--primaryColor); /* Invert the colors on hover */
+  border: 1px solid var(--primaryColor);
+}
+
+/* Additional styling for specific buttons */
+.edit-btn {
+  background-color: var(--primaryColor);
+  border-radius: 50px;
+}
+
+.delete-btn {
+  background-color: #e74c3c; /* Red color for delete */
+  border-radius: 50px;
+}
+
+.delete-btn:hover {
+  color: #e74c3c; /* Keep red text on hover */
+  border: 1px solid #e74c3c;
+}
 /* --------------- End of Manage Products Panel ---------------- */

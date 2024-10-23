@@ -24,6 +24,7 @@ const addProductBtn = document.querySelector(".add-product-btn");
 const addProductForm = document.getElementById('addProductForm');
 const manageProductsLink = document.querySelector(".sidebar-menu li a[href='#Manage-Products']");
 const productsLink = document.querySelector(".sidebar-menu li a[href='#Products']");
+const productList = document.getElementById('productList');
 
 
 let cart = [] // main cart array!
@@ -50,7 +51,7 @@ class Products{
 
             return products;
         } catch(error){
-            console.log(error); // if data not in json
+            console.error(error); // if data not in json
         }
         
     }
@@ -165,6 +166,9 @@ class UI {
                 this.updateCartContent(cartItem);
                 this.showCart();
 
+                /*6) Reset the info about the product in manage products section: */
+                this.renderProductList(Storage.getProducts());
+
             })
             
          })
@@ -245,12 +249,49 @@ class UI {
         //to make visible the cart just change visibility to cart overlay
         cartOverlay.classList.add('transparentBcg');//transparentBcg cart just make visibility to visible
         cartDOM.classList.add('showCart');
+        document.body.classList.add('no-scroll'); // Disable background scroll
     }
 
     showSidebar(){
         //to make visible the cart just change visibility to cart overlay
         sidebarOverlay.classList.add('showOverlay');
         sidebarDOM.classList.add('showSidebar');
+        document.body.classList.add('no-scroll'); // Disable background scroll
+    }
+
+    renderProductList(products){
+        productList.innerHTML = ''; // Clear the existing list
+
+        products.forEach(product => {
+            const productItem = document.createElement('div');
+            productItem.classList.add('product-item');
+            productItem.innerHTML = `
+            <div class="product-details">
+                <img src="${product.image}" alt="${product.title}" class="product-image" />
+                <p><strong>${product.title}</strong> - $${product.price} - Qty: ${product.quantity}</p>
+            </div>
+            <div class="product-actions">
+                <button class="manage-btn edit-btn" data-id="${product.id}">Edit</button>
+                <button class="manage-btn delete-btn" data-id="${product.id}">Delete</button>
+            </div>
+        `;
+            productList.appendChild(productItem);
+
+            // Add event listeners for Edit and Delete buttons
+            const editButton = productItem.querySelector('.edit-btn');
+            const deleteButton = productItem.querySelector('.delete-btn');
+
+            editButton.addEventListener('click', () => handleEditProduct(product));
+            deleteButton.addEventListener('click', () => handleDeleteProduct(product.id));
+        });
+    }
+
+    handleDeleteProduct(id){
+
+    }
+
+    handleEditProduct(product){
+
     }
 
     setupAPP(){
@@ -287,12 +328,14 @@ class UI {
             event.preventDefault(); // Prevent default anchor link behavior
             manageProductsOverlay.classList.add("transparentBcgManage");
             manageProductsDOM.classList.add("showManageProducts");
+            document.body.classList.add('no-scroll'); // Disable background scroll
         });
 
         // Close manage products panel when close button is clicked
         closeManageProductsBtn.addEventListener("click", function() {
             manageProductsOverlay.classList.remove("transparentBcgManage");
             manageProductsDOM.classList.remove("showManageProducts");
+            document.body.classList.remove('no-scroll'); // Re-enable background scroll
         });
 
         // Add event listener to the new product Form on submit
@@ -323,11 +366,13 @@ class UI {
     hideCart(){
         cartOverlay.classList.remove('transparentBcg');
         cartDOM.classList.remove('showCart');
+        document.body.classList.remove('no-scroll'); // Disable background scroll
     }
 
     hideSidebar(){
         sidebarOverlay.classList.remove('showOverlay');
         sidebarDOM.classList.remove('showSidebar');
+        document.body.classList.remove('no-scroll'); // Disable background scroll
     }
 
     populateCart(cart){
@@ -389,6 +434,11 @@ class UI {
                 //also update the value item-amount in DOM
                 // class item-amount object is sibling of chevron up object
                 addBtn.nextElementSibling.innerText = tempItem.amount;
+
+                /* Reset the info about the product in manage products section: */
+                this.renderProductList(Storage.getProducts());
+
+
             }
             else if(event.target.classList.contains('fa-chevron-down')){
                 let decBtn = event.target;
@@ -419,6 +469,9 @@ class UI {
                     //also update the value item-amount in DOM
                     // class item-amount object is sibling of chevron up object
                     decBtn.previousElementSibling.innerText = tempItem.amount;
+
+                    /* Reset the info about the product in manage products section: */
+                    this.renderProductList(Storage.getProducts());
                 }
             }
         });
@@ -469,6 +522,9 @@ class UI {
         /*6) Reset the quantity of this product: */
 
         this.updateQuantity(id , productAmountToRemove); // updates both dom and local storage
+
+        /*7) Reset the info about the product in manage products section: */
+        this.renderProductList(Storage.getProducts());
 
     }
 
@@ -521,6 +577,9 @@ class UI {
 
              //re-display the products to show the new one also
              this.displayProducts(prods);
+
+             //re render the products in the edit panel
+             this.renderProductList(prods);
 
 
          } catch (error) {
@@ -583,13 +642,13 @@ document.addEventListener("DOMContentLoaded" , ()=>{
       load this array on reload and not the json file.
     */
     let products = Storage.getProducts();
-
+    
     if (products.length === 0) {
       // If no products in storage, fetch from Products class (which returns a promise)
       products = Products.getProducts();
       products.then(products => {
-        ui.displayProducts(products);
-        
+        ui.displayProducts(products); //display products in main page
+        ui.renderProductList(products);//display products in manage products section
         // Store products in local storage
         Storage.saveProducts(products);
         }).then(() => {
@@ -599,7 +658,7 @@ document.addEventListener("DOMContentLoaded" , ()=>{
     } else {
         // If products are already in local storage
         ui.displayProducts(products);
-      
+        ui.renderProductList(products);
         // Call methods directly without waiting for a Promise
         ui.getBagButtons();
         ui.cartLogic();
