@@ -19,6 +19,7 @@
 const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
+const fs = require('fs');
 const path = require('path');
 const dotenv = require('dotenv');
 dotenv.config();
@@ -149,6 +150,26 @@ app.delete('/products/:id', async (req, res) => {
     try {
         const { id } = req.params; // Extract the ID from the route parameters
         
+        //delete the image of this product from the images folder first:
+        const product = await pdb.getById(id);
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+        // Get the image path and delete the image file
+        const imagePath = product.image; // Assuming 'image' contains the relative path to the image
+        const fullImagePath = path.join(__dirname, '../frontend', imagePath); // Adjust as per your image storage path
+
+        // Check if the image file exists and delete it
+        fs.unlink(fullImagePath, (err) => {
+            if (err) {
+                console.error(`Failed to delete image: ${err}`);
+                // You may choose to proceed with the product deletion even if image deletion fails
+            } else {
+                console.log('Image deleted successfully');
+            }
+        });
+
+        //delete the product from the db
         const result = await pdb.deleteById(id);
 
         if (result) {

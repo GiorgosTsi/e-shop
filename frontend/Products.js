@@ -43,4 +43,16 @@ export class Products{
             console.log(error);
         }
     }
+
+    static async deleteProduct(productId){
+
+        try{
+            await fetch(`http://localhost:5000/products/${productId}`, {
+                method: 'DELETE'
+            });
+
+        }catch{
+            console.error('Error at deleting product with id:' , productId);
+        }
+    }
 }

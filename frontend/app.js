@@ -239,12 +239,28 @@ class UI {
             const editButton = productItem.querySelector('.edit-btn');
             const deleteButton = productItem.querySelector('.delete-btn');
 
-            editButton.addEventListener('click', () => handleEditProduct(product));
-            deleteButton.addEventListener('click', () => handleDeleteProduct(product.id));
+            editButton.addEventListener('click', () => this.handleEditProduct(product));
+            deleteButton.addEventListener('click', () => this.handleDeleteProduct(product.id));
         });
     }
 
     handleDeleteProduct(id){
+        /*1) Remove product from the cart of customer: */
+        this.removeItem(id);
+
+        /*2) Delete product from backend DB */
+        Products.deleteProduct(id);
+
+        /*3) Remove the deleted product from products Local Storage */
+        let prods = Storage.getProducts();
+        prods = prods.filter(prod => prod.id !== id); //keep only the other products
+        Storage.saveProducts(prods);
+
+        /*4) Remove the product from products UI */
+        this.displayProducts(prods);
+
+        /*5) Remove also the product from manage products section */
+        this.renderProductList(prods);
 
     }
 
