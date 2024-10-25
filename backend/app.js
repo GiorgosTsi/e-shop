@@ -67,7 +67,6 @@ app.get('/products', async (req, res) => {
 app.post('/products' , (req,resp) => {
     console.log('insert request');
     const { title , price , image , quantity } = req.body; 
-    console.log(title);
     pdb.insertNewProduct(title , price , image , quantity)
         .then(result => {
             resp.status(201).json({

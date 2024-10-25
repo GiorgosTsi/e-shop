@@ -30,8 +30,9 @@ const productsLink = document.querySelector(".sidebar-menu li a[href='#Products'
 const productList = document.getElementById('productList');
 
 
-let cart = [] // main cart array!
-let buttonsDOM = []
+let cart = [] ;// main cart array!
+let buttonsDOM = [];
+let productFormEditMode = false ; // To know if product form adds new product or updates one
 
 //getting products class
 
@@ -239,15 +240,17 @@ class UI {
             const editButton = productItem.querySelector('.edit-btn');
             const deleteButton = productItem.querySelector('.delete-btn');
 
-            editButton.addEventListener('click', () => this.handleEditProduct(product));
-            deleteButton.addEventListener('click', () => this.handleDeleteProduct(product.id));
+            editButton.addEventListener('click', (event) => { event.preventDefault(); this.handleEditProduct(product) ; productFormEditMode = true;});
+            deleteButton.addEventListener('click', (event) => {event.preventDefault(); this.handleDeleteProduct(product.id)});
         });
     }
 
     handleDeleteProduct(id){
-        /*1) Remove product from the cart of customer: */
-        this.removeItem(id);
-
+        /*1) Remove product from the cart of customer , if exists: */
+        let exists = cart.filter(prod => prod.id === id);
+        if(exists.length){
+            this.removeItem(id);
+        }
         /*2) Delete product from backend DB */
         Products.deleteProduct(id);
 
@@ -265,8 +268,92 @@ class UI {
     }
 
     handleEditProduct(product){
+        console.log('On handle edit prod' + product);
+        // Pre-fill the form fields with the product details
+        document.getElementById('productTitle').value = product.title;
+        document.getElementById('productPrice').value = product.price;
+        document.getElementById('productQuantity').value = product.quantity;
+        
+        // Remove the 'required' attribute from the image input during update
+        document.getElementById('productImage').removeAttribute('required');
 
+        // Change button to update (you can change button text or logic here)
+        const submitButton = addProductForm.querySelector('button');
+        submitButton.textContent = 'Update Product';
+
+        //Scroll to the form to show user the products info
+        addProductForm.scrollIntoView({ behavior: "smooth" });
+
+        // Handle form submission for updating
+        addProductForm.onsubmit = async (event) => {
+            if(productFormEditMode){
+                console.log('On updating method');
+                event.preventDefault();
+
+                try {
+                    // Capture the updated values from the form
+                    const updatedTitle = document.getElementById('productTitle').value;
+                    const updatedPrice = document.getElementById('productPrice').value;
+                    const updatedQuantity = document.getElementById('productQuantity').value;
+                    const productImage = document.getElementById('productImage').files[0];
+
+                    let imagePath = product.image; // Keep existing image path unless a new one is uploaded
+
+                    // If a new image is selected, upload it to the server
+                    
+                    if (productImage) {
+                        const formData = new FormData();
+                        formData.append('image', productImage);
+
+                        const uploadResponse = await fetch('http://localhost:5000/upload-image', {
+                            method: 'POST',
+                            body: formData
+                        });
+                        const uploadData = await uploadResponse.json();
+                        imagePath = uploadData.imagePath; // Update the image path with the new one
+                    }
+
+                    // Prepare the updated product data
+                    const updatedProductData = {
+                        title: updatedTitle,
+                        price: updatedPrice,
+                        quantity: updatedQuantity,
+                        image: imagePath
+                    };
+                  
+                    Products.updateProduct(product.id , updatedProductData);
+
+                    // Update the localStorage and re-render the products
+                    let storedProducts = Storage.getProducts();
+                    updatedProductData.price = Number(updatedProductData.price);
+                    updatedProductData.quantity = parseInt(updatedProductData.quantity);
+                    let prodId = product.id;
+                    const updatedDataDestringed = {
+                        title: updatedProductData.title , 
+                        price: updatedProductData.price ,
+                        id: prodId ,
+                        image: updatedProductData.image ,
+                        quantity:updatedProductData.quantity};
+
+                    storedProducts = storedProducts.map(p => p.id === product.id ? updatedDataDestringed : p);
+                    Storage.saveProducts(storedProducts);
+
+                    this.renderProductList(storedProducts); // Re-render the updated list
+                    this.displayProducts(storedProducts);
+
+                    // Reset the form to add new product state
+                    addProductForm.reset();
+                    submitButton.textContent = 'Add Product'; // Change the button back to "Add Product"
+
+                    productFormEditMode = false //reset the editMode to insert mode
+                } catch (error) {
+                    console.error('Error updating product:', error);
+                }
+            }
+        };
     }
+
+
 
     setupAPP(){
         /*Method to be used when the dom is loaded.
@@ -315,10 +402,13 @@ class UI {
         // Add event listener to the new product Form on submit
         addProductForm.addEventListener('submit', async (event) => {
             event.preventDefault();
-            try{
-                await this.addNewProduct();
-            } catch{
-                console.error('Error at product Insertion');
+            // if the editMode var is false , then submit form means add new product!
+            if ( ! productFormEditMode){
+                try{
+                    await this.addNewProduct();
+                } catch{
+                    console.error('Error at product Insertion');
+                }
             }
         });
         
@@ -539,7 +629,7 @@ class UI {
                  image: imagePath, // Use the path of the uploaded image
                  quantity: productQuantity
              };
-
+             console.log(productData);
              const result = await Products.insertNewProduct(productData);
 
              //Add the product to the local storage products var and display them

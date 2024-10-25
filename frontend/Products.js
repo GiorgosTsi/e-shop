@@ -55,4 +55,20 @@ export class Products{
             console.error('Error at deleting product with id:' , productId);
         }
     }
+
+    static async updateProduct(id , updatedProductData){
+
+        try{
+            await fetch(`http://localhost:5000/products/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updatedProductData)
+            });
+
+        }catch{
+            console.error('Error at updating product with id:' , product.id);
+        }
+    }
 }
