@@ -68,7 +68,7 @@ export class Products{
             });
 
         }catch{
-            console.error('Error at updating product with id:' , product.id);
+            console.error('Error at updating product with id:' , id);
         }
     }
 }

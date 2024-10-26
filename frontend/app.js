@@ -89,6 +89,7 @@ class UI {
             }
 
             button.addEventListener('click',(event)=>{
+                event.preventDefault();
                 //if the add to cart button is pressed:
                 
                 let quantity = Storage.getProductQuantity(id);
@@ -346,6 +347,9 @@ class UI {
                     submitButton.textContent = 'Add Product'; // Change the button back to "Add Product"
 
                     productFormEditMode = false //reset the editMode to insert mode
+
+                    //reset the page to view changes:
+                    location.reload();
                 } catch (error) {
                     console.error('Error updating product:', error);
                 }
