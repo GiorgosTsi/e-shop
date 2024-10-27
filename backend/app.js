@@ -140,13 +140,13 @@ app.put('/products/:id', async (req, res) => {
         const oldImagePath = product.image; // Assuming 'image' contains the relative path to the image
         if(updates.image && updates.image !== oldImagePath){ // if new image is provided and its a different one:
             
-            const fullImagePath = path.join(__dirname, '../frontend', oldImagePath); // Adjust as per your image storage path
+            const fullImagePath = path.join(__dirname, '../frontend', oldImagePath); 
 
             // Check if the image file exists and delete it
             fs.unlink(fullImagePath, (err) => {
                 if (err) {
                     console.error(`Failed to delete image: ${err}`);
-                    // You may choose to proceed with the product deletion even if image deletion fails
+              
                 } else {
                     console.log('Image deleted successfully');
                 }

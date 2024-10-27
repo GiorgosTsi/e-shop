@@ -60,6 +60,48 @@ body.no-scroll {
   border-radius: 30%;
   color: var(--mainWhite);
 }
+
+.menu-icon,
+.search-icon,
+.cart-btn {
+    cursor: pointer;
+}
+
+.menu-icon,
+.search-icon,
+.cart-btn {
+    margin-right: 15px;
+}
+
+.menu-icon,
+.search-icon {
+    order: 1;
+}
+
+#store-logo {
+    order: 2;
+    margin: 0 auto;
+}
+
+.cart-btn {
+    order: 3;
+}
+
+.search-bar {
+  display: none; /* Hidden by default */
+  padding: 8px;
+  font-size: 16px;
+  border: 1px solid var(--primaryColor);
+  border-radius: 4px;
+  outline: none;
+  width: 200px; /* Adjust width as needed */
+  transition: opacity 0.3s ease;
+  border-radius: 50px;
+}
+
+.show-search-bar {
+  display: block; /* Show the search bar when toggled */
+}
 /* --------------- End of Navbar ---------------- */
 
 /* --------------- Hero ---------------- */

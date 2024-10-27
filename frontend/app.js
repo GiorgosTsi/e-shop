@@ -2,6 +2,8 @@ import {Storage} from './Storage.js';
 import {Products} from './Products.js';
 
 // Global variables
+const searchBtn = document.querySelector('.search-icon');
+const searchBar = document.getElementById('searchBar');
 
 const sidebarBtn = document.querySelector('.menu-icon');
 const closeSidebarBtn = document.querySelector('.close-sidebar');
@@ -23,8 +25,8 @@ const prodSection = document.querySelector('.products');
 const manageProductsOverlay = document.querySelector(".manage-products-overlay");
 const manageProductsDOM = document.querySelector(".manage-products");
 const closeManageProductsBtn = document.querySelector(".close-manage-products");
-const addProductBtn = document.querySelector(".add-product-btn");
 const addProductForm = document.getElementById('addProductForm');
+const submitButton = addProductForm.querySelector('button');
 const manageProductsLink = document.querySelector(".sidebar-menu li a[href='#Manage-Products']");
 const productsLink = document.querySelector(".sidebar-menu li a[href='#Products']");
 const productList = document.getElementById('productList');
@@ -68,9 +70,12 @@ class UI {
         });
         //all the above should be placed inside product center dom
         productsDOM.innerHTML = resultHTML;
+
+        //also enable their action listeners:
+        //this.getBagButtons();
     }
 
-    getBagButtons(){
+    initializeAddToBagButtons(){
         const btns = [...document.querySelectorAll(".bag-btn")];//get an array of bag btns
         buttonsDOM = btns;
 
@@ -219,6 +224,21 @@ class UI {
         document.body.classList.add('no-scroll'); // Disable background scroll
     }
 
+    showSearchBar(){
+        searchBar.classList.toggle('show-search-bar');
+        if (searchBar.classList.contains('show-search-bar')) {
+            searchBar.focus(); // Focus on the search bar when shown
+        }
+    }
+
+    hideSearchBar(){
+        // Hide the search bar
+        searchBar.style.display = 'none';
+
+        // Optionally, clear the search input after hiding
+        searchBar.value = '';
+    }
+
     renderProductList(products){
         productList.innerHTML = ''; // Clear the existing list
 
@@ -279,7 +299,6 @@ class UI {
         document.getElementById('productImage').removeAttribute('required');
 
         // Change button to update (you can change button text or logic here)
-        const submitButton = addProductForm.querySelector('button');
         submitButton.textContent = 'Update Product';
 
         //Scroll to the form to show user the products info
@@ -342,11 +361,7 @@ class UI {
                     this.renderProductList(storedProducts); // Re-render the updated list
                     this.displayProducts(storedProducts);
 
-                    // Reset the form to add new product state
-                    addProductForm.reset();
-                    submitButton.textContent = 'Add Product'; // Change the button back to "Add Product"
-
-                    productFormEditMode = false //reset the editMode to insert mode
+                    this.resetProductForm();
 
                     //reset the page to view changes:
                     location.reload();
@@ -357,7 +372,12 @@ class UI {
         };
     }
 
-
+    resetProductForm(){
+        // Reset the form to add new product state
+        addProductForm.reset();
+        submitButton.textContent = 'Add Product'; // Change the button back to "Add Product"
+        productFormEditMode = false //reset the editMode to insert mode
+    }
 
     setupAPP(){
         /*Method to be used when the dom is loaded.
@@ -382,6 +402,7 @@ class UI {
         productsLink.addEventListener("click", (event)=> {
             event.preventDefault(); // Prevent the default anchor link behavior
             // Smooth scroll to the products section
+            this.displayProducts(Storage.getProducts()); // re-load the products, because maybe before a search is made.
             prodSection.scrollIntoView({ behavior: "smooth" });
             this.hideSidebar();
         });
@@ -389,7 +410,7 @@ class UI {
         
     
         // Show manage products panel when "Manage Products" is clicked
-        manageProductsLink.addEventListener("click", function(event) {
+        manageProductsLink.addEventListener("click", (event) => {
             event.preventDefault(); // Prevent default anchor link behavior
             manageProductsOverlay.classList.add("transparentBcgManage");
             manageProductsDOM.classList.add("showManageProducts");
@@ -397,10 +418,11 @@ class UI {
         });
 
         // Close manage products panel when close button is clicked
-        closeManageProductsBtn.addEventListener("click", function() {
+        closeManageProductsBtn.addEventListener("click", () => {
             manageProductsOverlay.classList.remove("transparentBcgManage");
             manageProductsDOM.classList.remove("showManageProducts");
             document.body.classList.remove('no-scroll'); // Re-enable background scroll
+            this.resetProductForm(); //reset the form if its not already setted to `add product`.
         });
 
         // Add event listener to the new product Form on submit
@@ -429,6 +451,26 @@ class UI {
         sidebarBtn.addEventListener('click',this.showSidebar);
         //add evemt listener to close sidebar btn
         closeSidebarBtn.addEventListener('click',this.hideSidebar);
+        //add event listener to search button in navbar
+        searchBtn.addEventListener('click', this.showSearchBar);
+        //add event listener when enter is pressed in search bar
+        searchBar.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') { // Check if the Enter key was pressed
+                event.preventDefault(); // Prevent form submission or default Enter behavior
+                const prodTitle = event.target.value;
+                this.searchProducts(prodTitle); // Call the search function
+                this.hideSearchBar();//reset the search input bar
+            }
+        });
+        
+    }
+
+    searchProducts(title){
+        let productsCollection = Storage.getProducts();
+        let answer = productsCollection.filter(product => 
+            product.title.toLowerCase().includes(title.toLowerCase()));
+        this.displayProducts(answer);
+        productsDOM.scrollIntoView({ behavior: "smooth" });
     }
 
     hideCart(){
@@ -685,7 +727,7 @@ document.addEventListener("DOMContentLoaded" , ()=>{
         // Store products in local storage
         Storage.saveProducts(products);
         }).then(() => {
-              ui.getBagButtons();
+              ui.initializeAddToBagButtons();
               ui.cartLogic();
           });
     } else {
@@ -693,7 +735,7 @@ document.addEventListener("DOMContentLoaded" , ()=>{
         ui.displayProducts(products);
         ui.renderProductList(products);
         // Call methods directly without waiting for a Promise
-        ui.getBagButtons();
+        ui.initializeAddToBagButtons();
         ui.cartLogic();
       }
 });

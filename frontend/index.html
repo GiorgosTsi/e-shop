@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Giwrghs Shop</title>
+    <link rel="icon" type="image/svg+xml" href="./images/logo.svg">
 
     <!-- font_awesome link through cdn-->
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
@@ -15,12 +16,26 @@
     <!-- navbar -->
      <nav class="navbar">
         <div class="navbar-center">
+            <!-- Menu icon -->
             <div class="menu-icon">
                 <span class="nav-icon">
                     <i class="fa fa-bars"></i>
                 </span>
+            </div>
+            <!-- Search icon -->
+            <div class="search-icon">
+                <span class="nav-icon">
+                    <i class="fa fa-search"></i>
+                </span>
             </div> 
-            <img src="images/logo.svg" alt="store logo">
+
+            <!-- Search bar (hidden by default) -->
+            <input type="text" id="searchBar" class="search-bar" placeholder="Search products..." />
+            
+            <!-- Logo -->
+            <img id="store-logo" src="images/logo.svg" alt="store logo">
+            
+            <!-- Cart icon -->
             <div class="cart-btn">
                 <span class="nav-icon">
                     <i class="fa fa-cart-plus"></i>
