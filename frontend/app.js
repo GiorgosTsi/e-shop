@@ -71,8 +71,8 @@ class UI {
         //all the above should be placed inside product center dom
         productsDOM.innerHTML = resultHTML;
 
-        //also enable their action listeners:
-        //this.getBagButtons();
+        //also enable their action listeners , in order to be enabled at every display method call:
+        this.initializeAddToBagButtons();
     }
 
     initializeAddToBagButtons(){
@@ -82,61 +82,58 @@ class UI {
         //add event listener to every button
         btns.forEach(button => {
             let id = button.dataset.id;
-            let inCart = cart.find(item => item.id === id);
+            let inCart = cart.find(item => item.id === id); // data id is same as product id!
             if(inCart){
                 button.innerText = "In Cart";
-                button.disable = true;
+                button.disabled = true;
+            }
+            else if( Storage.getProductQuantity(id) <= 0){
+                button.innerText = "Out Of Stock";
+                button.disabled = true;
             }
             
-            if( Storage.getProductQuantity(id) <= 0){
-                button.innerText = "Out Of Stock";
-                button.disable = true;
-            }
-
+            /* Event listener should be added to the buttons either way(if in cart or not and if in stock or not),
+               so if quantity is updated or the product got removed from the cart,
+               add to bag btn to be clickable!!
+            */
             button.addEventListener('click',(event)=>{
                 event.preventDefault();
                 //if the add to cart button is pressed:
-                
-                let quantity = Storage.getProductQuantity(id);
-                
-                //redundant if because its not clickable anymore
-                if ( quantity <= 0){
-                    console.log(quantity);
-                    console.log("Out of stock");
-                    event.target.innerText = "Out Of Stock";
-                    event.target.disabled = true;
-                    return;
-                }
+                this.handleAddToBag(button , id);
 
-                // the product is in stock:
-
-                /*0) Decrease quantity both in DOM and products local storage */
-                this.updateQuantity(id,-1);
-
-                /*1) Display that its added in cart */
-                event.target.innerText = "In Cart";
-                event.target.disabled = true;
-
-                /*2) Add the product to the cart list(get the prod from localstorage using id) */
-                let cartItem = {...Storage.getProduct(id) , amount: 1}; //add also amount to this product
-                cart = [...cart,cartItem]; // append the product to the cart array
-            
-                /*3) Save the updated cart in local storage, so its visible after reload the page */
-                Storage.saveCart(cart);
-
-                /*4) Set cart values in cart icon and total Value*/
-                this.setCartValues(cart);
-
-                /*5) Update(add html) and Display cart content UI*/
-                this.updateCartContent(cartItem);
-                this.showCart();
-
-                /*6) Reset the info about the product in manage products section: */
-                this.renderProductList(Storage.getProducts());
-
-            })
-            
+            });
+                            
          })
+    }
+
+    handleAddToBag(button , itemId){
+
+        // To be here the product is in stock , because if it wasnt the button would not me clickable:
+
+        /*0) Decrease quantity both in DOM and products local storage */
+        this.updateQuantity(itemId,-1);
+
+        /*1) Display that its added in cart */
+        button.innerText = "In Cart";
+        button.disabled = true;
+
+        /*2) Add the product to the cart list(get the prod from localstorage using id) */
+        let cartItem = {...Storage.getProduct(itemId) , amount: 1}; //add also amount to this product
+        cart = [...cart,cartItem]; // append the product to the cart array
+    
+        /*3) Save the updated cart in local storage, so its visible after reload the page */
+        Storage.saveCart(cart);
+
+        /*4) Set cart values in cart icon and total Value*/
+        this.setCartValues(cart);
+
+        /*5) Update(add html) and Display cart content UI*/
+        this.updateCartContent(cartItem);
+        this.showCart();
+
+        /*6) Reset the info about the product in manage products section: */
+        this.renderProductList(Storage.getProducts());
+
     }
 
     updateQuantity(id, amount) {
@@ -225,10 +222,8 @@ class UI {
     }
 
     showSearchBar(){
-        searchBar.classList.toggle('show-search-bar');
-        if (searchBar.classList.contains('show-search-bar')) {
-            searchBar.focus(); // Focus on the search bar when shown
-        }
+        searchBar.style.display = 'block';
+        searchBar.focus(); // Set focus to the search bar for user convenience
     }
 
     hideSearchBar(){
@@ -270,7 +265,7 @@ class UI {
         /*1) Remove product from the cart of customer , if exists: */
         let exists = cart.filter(prod => prod.id === id);
         if(exists.length){
-            this.removeItem(id);
+            this.removeCartItem(id);
         }
         /*2) Delete product from backend DB */
         Products.deleteProduct(id);
@@ -316,6 +311,12 @@ class UI {
                     const updatedPrice = document.getElementById('productPrice').value;
                     const updatedQuantity = document.getElementById('productQuantity').value;
                     const productImage = document.getElementById('productImage').files[0];
+
+                     // Validate inputs
+                    if (!updatedTitle || updatedPrice <= 0 || updatedQuantity < 0) {
+                        alert("Please ensure:\n- Product title is filled in\n- Price is a positive number\n- Quantity is zero or greater");
+                        return; // Stop submission if validation fails
+                    }
 
                     let imagePath = product.image; // Keep existing image path unless a new one is uploaded
 
@@ -518,7 +519,7 @@ class UI {
                 let id = removeItem.dataset.id;
 
                 //remove item from the cart(local storage and DOM also!)
-                this.removeItem(id);
+                this.removeCartItem(id);
             }
             //if increase button is pressed:
             else if(event.target.classList.contains('fa-chevron-up')){
@@ -560,7 +561,7 @@ class UI {
                 //if amount = 1 we need to remove it from cart
                 if( tempItem.amount === 1){
                     console.log("item need to be removed");
-                    this.removeItem(id);
+                    this.removeCartItem(id);
                 }
 
                 else{
@@ -590,11 +591,11 @@ class UI {
     clearCart(){
         let cartItems = cart.map( item => item.id);
         cartItems.forEach( itemID => {
-            this.removeItem(itemID);
+            this.removeCartItem(itemID);
         });
     }
 
-    removeItem(id){
+    removeCartItem(id){
         let productAmountToRemove = cart.filter( item => item.id === id)[0].amount;
 
         /*1) Remove item from the cart */
@@ -630,7 +631,7 @@ class UI {
         this.setCartValues(cart); //set again #items and total cost.
 
         /*6) Reset the quantity of this product: */
-
+        
         this.updateQuantity(id , productAmountToRemove); // updates both dom and local storage
 
         /*7) Reset the info about the product in manage products section: */
@@ -650,7 +651,12 @@ class UI {
          const productTitle = document.getElementById('productTitle').value;
          const productPrice = document.getElementById('productPrice').value;
          const productQuantity = document.getElementById('productQuantity').value;
-
+         
+          // Validate inputs
+         if (!productTitle || productPrice <= 0 || productQuantity < 0) {
+            alert("Please ensure:\n- Product title is filled in\n- Price is a positive number\n- Quantity is zero or greater");
+            return; // Stop submission if validation fails
+         }
          // Append the image to the FormData object
          formData.append('image', productImage);
         
@@ -722,20 +728,17 @@ document.addEventListener("DOMContentLoaded" , ()=>{
       // If no products in storage, fetch from Products class (which returns a promise)
       products = Products.getProducts();
       products.then(products => {
-        ui.displayProducts(products); //display products in main page
-        ui.renderProductList(products);//display products in manage products section
         // Store products in local storage
         Storage.saveProducts(products);
-        }).then(() => {
-              ui.initializeAddToBagButtons();
-              ui.cartLogic();
-          });
+        ui.displayProducts(products); //display products in main page
+        ui.renderProductList(products);//display products in manage products section
+        }).then(() => {ui.cartLogic();});
+
     } else {
         // If products are already in local storage
         ui.displayProducts(products);
         ui.renderProductList(products);
         // Call methods directly without waiting for a Promise
-        ui.initializeAddToBagButtons();
         ui.cartLogic();
       }
 });
