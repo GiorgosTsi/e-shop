@@ -624,9 +624,11 @@ class UI {
         /*4) Reset the add to cart button of this item: */
 
         let button = this.getSingleButton(id);
-        button.disabled = false;
-        button.innerHTML = `<i class="fa fa-shopping-cart"></i>add to cart`;
-
+        if( button ){
+            button.disabled = false;
+            button.innerHTML = `<i class="fa fa-shopping-cart"></i>add to cart`;
+        }
+        
         /*5) Update total value in cart */
         this.setCartValues(cart); //set again #items and total cost.
 

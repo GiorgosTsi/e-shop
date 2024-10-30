@@ -30,7 +30,7 @@ app.use(cors());
 
 // Define storage for images using multer
 const storage = multer.diskStorage({
-    destination: path.join(__dirname, '../frontend/images'),  // Adjust the path to store in the correct directory
+    destination: path.join(__dirname, '../../frontend/images'),  // Adjust the path to store in the correct directory
     filename: (req, file, cb) => {
         // Create a unique filename by adding a timestamp
         cb(null, `${Date.now()}-${file.originalname}`);
@@ -140,7 +140,7 @@ app.put('/products/:id', async (req, res) => {
         const oldImagePath = product.image; // Assuming 'image' contains the relative path to the image
         if(updates.image && updates.image !== oldImagePath){ // if new image is provided and its a different one:
             
-            const fullImagePath = path.join(__dirname, '../frontend', oldImagePath); 
+            const fullImagePath = path.join(__dirname, '../../frontend', oldImagePath); 
 
             // Check if the image file exists and delete it
             fs.unlink(fullImagePath, (err) => {
@@ -177,7 +177,7 @@ app.delete('/products/:id', async (req, res) => {
         }
         // Get the image path and delete the image file
         const imagePath = product.image; // Assuming 'image' contains the relative path to the image
-        const fullImagePath = path.join(__dirname, '../frontend', imagePath); // Adjust as per your image storage path
+        const fullImagePath = path.join(__dirname, '../../frontend', imagePath); // Adjust as per your image storage path
 
         // Check if the image file exists and delete it
         fs.unlink(fullImagePath, (err) => {
