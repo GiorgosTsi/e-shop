@@ -25,7 +25,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const app = express(); //initialize the app
-app.use(express.json());
+app.use(express.json()); // use express.json middleware to automatically parse json in req body as Json object.
 app.use(cors());
 
 // Define storage for images using multer

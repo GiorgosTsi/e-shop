@@ -45,13 +45,17 @@ class OrdersDB {
     }
 
     // Insert a new order
-    async insertOrder(products, totalPrice) {
+    async insertOrder(products, totalPrice , status) {
         const insertQuery = `
             INSERT INTO orders (products, total_price, status)
             VALUES ($1, $2, $3) RETURNING *;
         `;
         try {
-            const result = await client.query(insertQuery, [products, totalPrice, 'Pending']);
+            if(!status){
+                status = 'Pending';
+            }
+            // Ensure products is properly formatted as JSON
+            const result = await client.query(insertQuery, [JSON.stringify(products), totalPrice, status]);
             return result.rows[0];
         } catch (error) {
             console.error('Error inserting order:', error);
