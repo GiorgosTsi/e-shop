@@ -2,7 +2,10 @@ version: '3.8'
 
 ## USE docker compose down -v to remove and reset any volume-network(reset your db)
 
+
 services:
+
+# Products Database Service
   products_db:
     image: postgres:latest
     container_name: products
@@ -11,14 +14,30 @@ services:
       POSTGRES_PASSWORD: admin
       POSTGRES_DB: products
     volumes:
-      - db-data:/var/lib/postgresql/data
+      - products-db-data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     networks:
       - eshop-network
 
+# Orders Database Service
+  orders_db:
+    image: postgres:latest
+    container_name: orders
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: orders
+    volumes:
+      - orders-db-data:/var/lib/postgresql/data
+    ports:
+      - "5431:5432"  # Maps container's PostgreSQL port to 5431 on the host
+    networks:
+      - eshop-network
+
 volumes:
-  db-data:
+  products-db-data:
+  orders-db-data:
 
 networks:
   eshop-network:
