@@ -54,7 +54,7 @@ class OrdersDB {
             if(!status){
                 status = 'Pending';
             }
-            // Ensure products is properly formatted as JSON
+            // Ensure products is properly formatted as JSON because its initially js object
             const result = await client.query(insertQuery, [JSON.stringify(products), totalPrice, status]);
             return result.rows[0];
         } catch (error) {

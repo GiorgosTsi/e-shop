@@ -1,5 +1,6 @@
 import {Storage} from './Storage.js';
 import {Products} from './Products.js';
+import {Orders} from './Orders.js';
 
 // Global variables
 const searchBtn = document.querySelector('.search-icon');
@@ -13,6 +14,7 @@ const sidebarDOM = document.querySelector('.sidebar');
 const cartBtn = document.querySelector('.cart-btn');
 const closeCartBtn = document.querySelector('.close-cart');
 const clearCartBtn = document.querySelector('.clear-cart');
+const checkoutBtn = document.querySelector('.checkout-btn');
 const cartDOM = document.querySelector('.cart');
 const cartOverlay = document.querySelector('.cart-overlay');
 const cartItems = document.querySelector('.cart-items');
@@ -448,6 +450,8 @@ class UI {
         cartBtn.addEventListener('click',this.showCart);
         //add evemt listener to close btn
         closeCartBtn.addEventListener('click',this.hideCart);
+        //add event listener to checkout btn in the cart section
+        checkoutBtn.addEventListener('click',() => {this.handleCheckout();});
         //add event listener to sidebar btn
         sidebarBtn.addEventListener('click',this.showSidebar);
         //add evemt listener to close sidebar btn
@@ -463,6 +467,49 @@ class UI {
                 this.hideSearchBar();//reset the search input bar
             }
         });
+        
+    }
+
+    
+    async handleCheckout(){
+        if(cart.length <= 0){
+            console.log('No products added in cart to procceed to checkout');
+            return;
+        }
+        
+        console.log('proceed to checkout..');
+        const cartItems = Storage.getCart();
+            
+        /* Now we need to construct the order object:
+               
+            Order object contains: 
+            { products: [list of products] , total_price : price}
+        */
+        const total_price = parseFloat(cartTotal.innerHTML);
+
+        const products = cartItems.map(item => ({    
+        title: item.title,
+        amount: item.amount,
+        product_id: parseInt(item.id)
+        }));
+            
+        const order = { products , total_price}; //JS object. To be stringified in order to passed as request body.
+
+        try {
+            const response = await Orders.insertOrder(order); // Await the promise result
+                
+            const responseData = await response.json(); // Parse the JSON response
+
+            if (responseData.success) {
+                console.log('Order placed successfully');
+                //this.clearCart(); // Optional: Clear the cart if the order is successful
+                
+            } else {
+                console.log('Order placement failed:', responseData.message);
+            }
+        } catch (error) {
+            console.error('Error placing order:', error);
+        }
         
     }
 

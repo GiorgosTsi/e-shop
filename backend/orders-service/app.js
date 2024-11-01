@@ -65,6 +65,7 @@ app.post('/orders' , async (req,res) => {
         
         // Respond with the newly created order details
         res.status(201).json({ success: true, message: 'Order created successfully', order: newOrder });
+        console.log('Order inserted succesfully!');
     } catch (error) {
         console.error('Error creating order:', error);
         res.status(500).json({ success: false, message: 'Error creating order', error: error.message });
