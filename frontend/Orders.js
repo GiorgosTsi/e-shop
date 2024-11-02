@@ -1,7 +1,13 @@
 export class Orders{
 
     static async getAllOrders(){
-
+        try {
+            const response = await fetch('http://localhost:5001/orders');
+            let orders = await response.json();
+            return orders; //Beware that total_price of each order is in string format due to PSql representaion of numeric.
+        } catch(error) {
+            console.error('Fetching all orders error ' ,error);
+        }
     }
 
 
@@ -19,7 +25,7 @@ export class Orders{
                 const error = await response.json();
                 alert(`Failed to place order: ${error.message}`);
             }
-            
+
             return response;
         } catch (error) {
             console.error('Error during checkout:', error);

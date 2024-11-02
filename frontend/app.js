@@ -32,6 +32,12 @@ const submitButton = addProductForm.querySelector('button');
 const manageProductsLink = document.querySelector(".sidebar-menu li a[href='#Manage-Products']");
 const productsLink = document.querySelector(".sidebar-menu li a[href='#Products']");
 const productList = document.getElementById('productList');
+const ordersLink = document.querySelector(".sidebar-menu li a[href='#Orders']");
+const ordersOverlay = document.querySelector('.orders-overlay');
+const closeOrdersBtn = document.querySelector('.close-orders-btn');
+const ordersList = document.getElementById('orders-list');
+
+
 
 
 let cart = [] ;// main cart array!
@@ -236,6 +242,71 @@ class UI {
         searchBar.value = '';
     }
 
+    renderOrdersList(orders){
+
+        // Clear any existing content in the orders list (to prevent duplication)
+        ordersList.innerHTML = "";
+
+        // Loop through each order and create a table row with order details
+        orders.forEach(order => {
+            // Create a new table row element
+            const row = document.createElement("tr");
+
+            // Create table data for each property in the order
+            const idCell = document.createElement("td");
+            idCell.textContent = order.id;
+            
+            const productsCell = document.createElement("td");
+            // Format the products array to display title and amount
+            productsCell.textContent = order.products.map(p => `${p.title} x${p.amount}`).join(", ");
+
+            const totalPriceCell = document.createElement("td");
+            totalPriceCell.textContent = `$${parseFloat(order.total_price).toFixed(2)}`; // Ensure 2 decimal points
+
+            const statusCell = document.createElement("td");
+            statusCell.textContent = order.status;
+
+            // Append each cell to the row
+            row.appendChild(idCell);
+            row.appendChild(productsCell);
+            row.appendChild(totalPriceCell);
+            row.appendChild(statusCell);
+
+            // Add the row to the orders list table body
+            ordersList.appendChild(row);
+        });
+
+    }
+
+    appendOrderList(order){
+         // Create a new table row element
+        const row = document.createElement("tr");
+
+        // Create table data for each property in the order
+        const idCell = document.createElement("td");
+        idCell.textContent = order.id;
+
+        const productsCell = document.createElement("td");
+        // Format the products array to display title and amount
+        productsCell.textContent = order.products.map(p => `${p.title} x${p.amount}`).join(", ");
+
+        const totalPriceCell = document.createElement("td");
+        totalPriceCell.textContent = `$${parseFloat(order.total_price).toFixed(2)}`; // Ensure 2 decimal points
+
+        const statusCell = document.createElement("td");
+        statusCell.textContent = order.status;
+
+        // Append each cell to the row
+        row.appendChild(idCell);
+        row.appendChild(productsCell);
+        row.appendChild(totalPriceCell);
+        row.appendChild(statusCell);
+
+        // Add the row to the orders list table body
+        ordersList.appendChild(row);
+    }
+
+
     renderProductList(products){
         productList.innerHTML = ''; // Clear the existing list
 
@@ -368,7 +439,7 @@ class UI {
                         this.setCartValues(cart); // Recalculate totals
                         Storage.saveCart(cart);
                     }
-                    
+
                     this.renderProductList(storedProducts); // Re-render the updated list
                     this.displayProducts(storedProducts);
 
@@ -448,6 +519,21 @@ class UI {
                 }
             }
         });
+
+        // Show Orders panel when "Orders" in menu is clicked
+        ordersLink.addEventListener("click", (event) => {
+            event.preventDefault(); // Prevent default anchor link behavior
+            ordersOverlay.style.display = 'flex';
+            document.body.classList.add('no-scroll'); // Disable background scroll
+        });
+
+        closeOrdersBtn.addEventListener("click" , (event)=> {
+            event.preventDefault(); 
+            ordersOverlay.style.display = 'none'; // hide the orders panel
+            document.body.classList.remove('no-scroll'); // Re-enable background scroll
+        });
+
+
         
         cart = Storage.getCart();
         //set the cart values
@@ -511,6 +597,8 @@ class UI {
             if (responseData.success) {
                 console.log('Order placed successfully');
                 //this.clearCart(); // Optional: Clear the cart if the order is successful
+                //add order to the OrdersList section
+                this.appendOrderList(responseData.order);
                 
             } else {
                 console.log('Order placement failed:', responseData.message);
@@ -797,5 +885,14 @@ document.addEventListener("DOMContentLoaded" , ()=>{
         ui.renderProductList(products);
         // Call methods directly without waiting for a Promise
         ui.cartLogic();
-      }
+    }
+
+    /*Load the orders from Orders DB and display them in the hidden orders panel */
+    let orders = Orders.getAllOrders();
+    orders.then(orders => {
+        console.log(orders);
+        ui.renderOrdersList(orders);
+    });
+
+
 });

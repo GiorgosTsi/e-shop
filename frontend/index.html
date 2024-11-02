@@ -125,7 +125,7 @@
             <ul class="sidebar-menu">
                 <li><a href="#Products">Products</a></li>
                 <li><a href="#Manage-Products">Manage Products</a></li>
-                <li><a href="#Order">Orders</a></li>
+                <li><a href="#Orders">Orders</a></li>
             </ul>
         </div>
     </div>
@@ -159,6 +159,30 @@
         </div>
     </div>
     <!-- End of Manage Products Panel -->
+
+    <!-- Orders Section -->
+    <div class="orders-overlay">
+        <div class="orders-section">
+            <span class="close-orders-btn">
+                <i class="fa fa-close"></i>
+            </span>
+            <h2>Manage Orders</h2>
+            <table class="orders-table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Products</th>
+                        <th>Total Price</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="orders-list">
+                    <!-- Orders will be dynamically loaded here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- End of Orders Section -->
 
     <script type="module" src="app.js"></script>
 </body>
