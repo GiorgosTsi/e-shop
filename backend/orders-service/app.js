@@ -62,7 +62,6 @@ app.post('/orders' , async (req,res) => {
     try {
         // Insert the order into the database
         const newOrder = await odb.insertOrder(products, total_price , status);
-        
         // Respond with the newly created order details
         res.status(201).json({ success: true, message: 'Order created successfully', order: newOrder });
         console.log('Order inserted succesfully!');

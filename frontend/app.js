@@ -346,7 +346,7 @@ class UI {
                   
                     Products.updateProduct(product.id , updatedProductData);
 
-                    // Update the localStorage and re-render the products
+                    // Update the Products list with products new info and re-render the products
                     let storedProducts = Storage.getProducts();
                     updatedProductData.price = Number(updatedProductData.price);
                     updatedProductData.quantity = parseInt(updatedProductData.quantity);
@@ -361,6 +361,14 @@ class UI {
                     storedProducts = storedProducts.map(p => p.id === product.id ? updatedDataDestringed : p);
                     Storage.saveProducts(storedProducts);
 
+                    //also update the price of the product in the cart array(if existed)
+                    const prod = cart.find(item => item.id === prodId);
+                    if (prod) {
+                        prod.price = updatedProductData.price;
+                        this.setCartValues(cart); // Recalculate totals
+                        Storage.saveCart(cart);
+                    }
+                    
                     this.renderProductList(storedProducts); // Re-render the updated list
                     this.displayProducts(storedProducts);
 
