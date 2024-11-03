@@ -927,7 +927,15 @@ document.addEventListener("DOMContentLoaded" , ()=>{
         Storage.saveProducts(products);
         ui.displayProducts(products); //display products in main page
         ui.renderProductList(products);//display products in manage products section
-        }).then(() => {ui.cartLogic();});
+        }).then(() => {
+            ui.cartLogic();
+            /*Load the orders from Orders DB and display them in the hidden orders panel */
+            let orders = Orders.getAllOrders();
+            orders.then(orders => {
+                //console.log(orders);
+                ui.renderOrdersList(orders);
+            });
+        });
 
     } else {
         // If products are already in local storage
@@ -935,14 +943,13 @@ document.addEventListener("DOMContentLoaded" , ()=>{
         ui.renderProductList(products);
         // Call methods directly without waiting for a Promise
         ui.cartLogic();
+        /*Load the orders from Orders DB and display them in the hidden orders panel */
+        let orders = Orders.getAllOrders();
+        orders.then(orders => {
+            //console.log(orders);
+            ui.renderOrdersList(orders);
+        });
     }
-
-    /*Load the orders from Orders DB and display them in the hidden orders panel */
-    let orders = Orders.getAllOrders();
-    orders.then(orders => {
-        //console.log(orders);
-        ui.renderOrdersList(orders);
-    });
 
 
 });
