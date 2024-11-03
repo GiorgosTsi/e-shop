@@ -242,67 +242,117 @@ class UI {
         searchBar.value = '';
     }
 
-    renderOrdersList(orders){
-
+    renderOrdersList(orders) {
         // Clear any existing content in the orders list (to prevent duplication)
         ordersList.innerHTML = "";
-
+    
         // Loop through each order and create a table row with order details
         orders.forEach(order => {
             // Create a new table row element
             const row = document.createElement("tr");
-
+    
             // Create table data for each property in the order
             const idCell = document.createElement("td");
             idCell.textContent = order.id;
-            
+    
             const productsCell = document.createElement("td");
-            // Format the products array to display title and amount
-            productsCell.textContent = order.products.map(p => `${p.title} x${p.amount}`).join(", ");
-
+            productsCell.classList.add("products-order-cell"); 
+    
+            // Generate HTML for each product, including the image and quantity
+            order.products.forEach(p => {
+                const productContainer = document.createElement("div");
+                productContainer.classList.add("product-order-container"); // For styling each product block
+    
+                // Retrieve the product data from local storage
+                const storedProduct = Storage.getProduct(p.product_id.toString());
+    
+                // Create an image element for the product
+                const productImg = document.createElement("img");
+                productImg.src = storedProduct?.image || './images/placeholder.jpg'; // Fallback to placeholder if not found
+                productImg.alt = p.title;
+                productImg.classList.add("product-order-img");
+    
+                // Create a span element to show title and amount
+                const productInfo = document.createElement("span");
+                productInfo.textContent = `${p.title} x${p.amount}`;
+    
+                // Append image and info to the product container
+                productContainer.appendChild(productImg);
+                productContainer.appendChild(productInfo);
+    
+                // Add the product container to the products cell
+                productsCell.appendChild(productContainer);
+            });
+    
             const totalPriceCell = document.createElement("td");
             totalPriceCell.textContent = `$${parseFloat(order.total_price).toFixed(2)}`; // Ensure 2 decimal points
-
+    
             const statusCell = document.createElement("td");
             statusCell.textContent = order.status;
-
+    
             // Append each cell to the row
             row.appendChild(idCell);
             row.appendChild(productsCell);
             row.appendChild(totalPriceCell);
             row.appendChild(statusCell);
-
+    
             // Add the row to the orders list table body
             ordersList.appendChild(row);
         });
-
     }
 
-    appendOrderList(order){
-         // Create a new table row element
+    appendOrderList(order) {
+        // Create a new table row element
         const row = document.createElement("tr");
-
+    
         // Create table data for each property in the order
         const idCell = document.createElement("td");
         idCell.textContent = order.id;
-
+    
+        // Cell for products with images and quantities
         const productsCell = document.createElement("td");
-        // Format the products array to display title and amount
-        productsCell.textContent = order.products.map(p => `${p.title} x${p.amount}`).join(", ");
-
+        productsCell.classList.add("products-order-cell");
+    
+        order.products.forEach(p => {
+            const productContainer = document.createElement("div");
+            productContainer.classList.add("product-order-container");
+    
+            // Retrieve product details from local storage
+            const storedProduct = Storage.getProduct(p.product_id.toString());
+    
+            // Create an image element for each product
+            const productImg = document.createElement("img");
+            productImg.src = storedProduct?.image || './images/placeholder.jpg'; // Use placeholder if no image found
+            productImg.alt = p.title;
+            productImg.classList.add("product-order-img");
+    
+            // Create a span element to show the title and amount
+            const productInfo = document.createElement("span");
+            productInfo.textContent = `${p.title} x${p.amount}`;
+    
+            // Append the image and info to the product container
+            productContainer.appendChild(productImg);
+            productContainer.appendChild(productInfo);
+    
+            // Add the product container to the products cell
+            productsCell.appendChild(productContainer);
+        });
+    
+        // Create cell for total price
         const totalPriceCell = document.createElement("td");
         totalPriceCell.textContent = `$${parseFloat(order.total_price).toFixed(2)}`; // Ensure 2 decimal points
-
+    
+        // Create cell for order status
         const statusCell = document.createElement("td");
         statusCell.textContent = order.status;
-
+    
         // Append each cell to the row
         row.appendChild(idCell);
         row.appendChild(productsCell);
         row.appendChild(totalPriceCell);
         row.appendChild(statusCell);
-
-        // Add the row to the orders list table body
+    
+        // Add the new row to the orders list table body
         ordersList.appendChild(row);
     }
 
@@ -890,7 +940,7 @@ document.addEventListener("DOMContentLoaded" , ()=>{
     /*Load the orders from Orders DB and display them in the hidden orders panel */
     let orders = Orders.getAllOrders();
     orders.then(orders => {
-        console.log(orders);
+        //console.log(orders);
         ui.renderOrdersList(orders);
     });
 
