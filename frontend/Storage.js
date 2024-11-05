@@ -16,6 +16,9 @@ export class Storage{
     static getProduct(id){
         let products = JSON.parse(localStorage.getItem('products'));
         let product =  products.find(product => product.id === id);
+        if(!product){
+            return null;
+        }
         const { quantity, ...productWithoutQuantity } = product; // Destruct and exclude "quantity"
         return productWithoutQuantity; // Return the modified object
     }
@@ -23,6 +26,9 @@ export class Storage{
     static getProductQuantity(id){
         let products = JSON.parse(localStorage.getItem('products'));
         let product =  products.find(product => product.id === (id));
+        if(!product){
+            return null;
+        }
         return product.quantity;
     }
 

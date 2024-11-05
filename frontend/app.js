@@ -265,7 +265,7 @@ class UI {
     
                 // Retrieve the product data from local storage
                 const storedProduct = Storage.getProduct(p.product_id.toString());
-    
+                
                 // Create an image element for the product
                 const productImg = document.createElement("img");
                 productImg.src = storedProduct?.image || './images/placeholder.jpg'; // Fallback to placeholder if not found
