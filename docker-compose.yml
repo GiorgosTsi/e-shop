@@ -15,6 +15,8 @@ services:
       POSTGRES_DB: products
     volumes:
       - products-db-data:/var/lib/postgresql/data
+    # You can remove the exposed port 5432 in localhost,because when the node app
+    # is dockerized , node app and db communicates via internal docker network
     ports:
       - "5432:5432"
     networks:
@@ -34,6 +36,65 @@ services:
       - "5431:5432"  # Maps container's PostgreSQL port to 5431 on the host
     networks:
       - eshop-network
+
+
+# Node.js Service for Products
+  products_service:
+    image: node:17-alpine  # Use the Node.js base image directly
+    container_name: products_service
+    working_dir: /app  # Set working directory within the container
+    volumes:
+      - ./backend/products-service:/app  # Mount only the products-service directory to /app in the container
+    environment:
+      # Environment variables that Node.js app uses to connect to the database
+      # Within Docker, products_service can reach products_db on the internal Docker network via products_db:5432.Not with localhost request.
+      PGHOST: products_db  # Use the Docker service name to connect within the network , or use localhost to do egress networking
+      PGUSER: admin
+      PGPASSWORD: admin
+      PGDATABASE: products
+      PGPORT: 5432
+      PORT: 5000
+    command: sh -c "npm install && node app.js"  # Install dependencies and start the app
+    ports:
+      - "5000:5000"  # Expose Node.js app on host's port 5000
+    networks:
+      - eshop-network
+    depends_on:
+      - products_db  # Ensure database starts before the Node.js app
+
+
+# Node.js Service for Orders
+  orders_service:
+    image: node:17-alpine  # Use the Node.js base image directly
+    container_name: orders_service
+    working_dir: /app  # Set working directory within the container
+    volumes:
+      - ./backend/orders-service:/app  # Mount only the products-service directory to /app in the container
+    environment:
+      # Environment variables that Node.js app uses to connect to the database
+      PGHOST: orders_db  # Use the Docker service name to connect within the network
+      PGUSER: admin
+      PGPASSWORD: admin
+      PGDATABASE: orders
+      PGPORT: 5432
+      PORT: 5000
+    command: sh -c "npm install && node app.js"  # Install dependencies and start the app
+    ports:
+      - "5001:5000"  # Expose Node.js app on host's port 5000
+    networks:
+      - eshop-network
+    depends_on:
+      - orders_db  # Ensure database starts before the Node.js app
+
+# Frontend service to display UI at 3000 port at localhost
+  frontend:
+      build:
+        context: ./frontend  
+      ports:
+        - "3000:80"  # Maps localhost:3000 to the nginx container's port 80
+      networks:
+        - eshop-network  # Same network as the backend services to communicate internally
+
 
 volumes:
   products-db-data:

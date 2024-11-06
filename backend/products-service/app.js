@@ -16,6 +16,19 @@
     Purpose: Delete a resource.
 */
 
+/******* Some notes about the communication between node app and database ***********
+
+Since products_service and products_db are on the same Docker network (eshop-network), 
+the Node app can connect to the products_db by using the container name (products_db) as the database host. 
+This avoids the need for localhost references for internal networking.
+
+Response to Frontend: The Node.js app processes the database request and sends the response back. 
+This response then reaches your frontend as the result of the initial fetch request.
+
+When you have not dockerized the node apps , the node app connects to the database via external request
+in 5432 port on localhost.
+*/
+
 const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
@@ -223,4 +236,4 @@ app.post('/upload-image', upload.single('image'), (req, resp) => {
 });
 
 /******************************* INITIALIZE APP , TO LISTEN ON 5000 PORT *************************/
-app.listen(process.env.PORT , () => console.log("app is running"));
+app.listen(process.env.PORT , () => console.log("app is running at port:" + process.env.PORT));

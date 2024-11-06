@@ -53,6 +53,8 @@ class UI {
     //method to display the products on DOM
     displayProducts(products){
         let resultHTML = '';
+        const placeholderImage = './images/placeholder.jpg'; // Replace with actual path to your placeholder image
+
         products.forEach(product => {
 
             //use string literal for final product html
@@ -60,7 +62,8 @@ class UI {
             <!-- single product-->
              <article class="product">
                 <div class="img-container">
-                    <img src=${product.image} alt="product" class="product-img">
+                    <img src="${product.image}" alt="product" class="product-img" 
+                        onerror="this.onerror=null; this.src='${placeholderImage}';">
                     <button class="bag-btn" data-id=${product.id}>
                         <i class="fa fa-shopping-cart"></i>
                         add to cart

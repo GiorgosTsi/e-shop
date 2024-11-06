@@ -73,4 +73,4 @@ app.post('/orders' , async (req,res) => {
 
 
 /******************************* INITIALIZE APP , TO LISTEN ON 5001 PORT *************************/
-app.listen(process.env.PORT , () => console.log("app is running"));
+app.listen(process.env.PORT , () => console.log("app is running at port:" + process.env.PORT ));
