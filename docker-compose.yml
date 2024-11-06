@@ -14,7 +14,7 @@ services:
       POSTGRES_PASSWORD: admin
       POSTGRES_DB: products
     volumes:
-      - products-db-data:/var/lib/postgresql/data
+      - products-db-data:/var/lib/postgresql/data # mount products-db volume inside container
     # You can remove the exposed port 5432 in localhost,because when the node app
     # is dockerized , node app and db communicates via internal docker network
     ports:
@@ -31,7 +31,7 @@ services:
       POSTGRES_PASSWORD: admin
       POSTGRES_DB: orders
     volumes:
-      - orders-db-data:/var/lib/postgresql/data
+      - orders-db-data:/var/lib/postgresql/data # mount orders-db volume inside container
     ports:
       - "5431:5432"  # Maps container's PostgreSQL port to 5431 on the host
     networks:
@@ -44,7 +44,8 @@ services:
     container_name: products_service
     working_dir: /app  # Set working directory within the container
     volumes:
-      - ./backend/products-service:/app  # Mount only the products-service directory to /app in the container
+      - ./backend/products-service:/app  # Mount only the products-service directory to /app in the container in order to have app's code and dependencies
+      - images-data:/app/images  # Mount the shared volume for images.With this way images uploaded in the node app will be saved in the shared volume and later can be accessed via frontend
     environment:
       # Environment variables that Node.js app uses to connect to the database
       # Within Docker, products_service can reach products_db on the internal Docker network via products_db:5432.Not with localhost request.
@@ -69,7 +70,7 @@ services:
     container_name: orders_service
     working_dir: /app  # Set working directory within the container
     volumes:
-      - ./backend/orders-service:/app  # Mount only the products-service directory to /app in the container
+      - ./backend/orders-service:/app  # Mount only the products-service directory to /app in the container in order to have app's code and dependencies
     environment:
       # Environment variables that Node.js app uses to connect to the database
       PGHOST: orders_db  # Use the Docker service name to connect within the network
@@ -80,7 +81,7 @@ services:
       PORT: 5000
     command: sh -c "npm install && node app.js"  # Install dependencies and start the app
     ports:
-      - "5001:5000"  # Expose Node.js app on host's port 5000
+      - "5001:5000"  # Expose Node.js app on host's port 5001
     networks:
       - eshop-network
     depends_on:
@@ -89,16 +90,22 @@ services:
 # Frontend service to display UI at 3000 port at localhost
   frontend:
       build:
-        context: ./frontend  
+        context: ./frontend   # where dockerfile for this image is located
+      volumes:
+        - images-data:/usr/share/nginx/html/images  # Mount shared volume for images in the frontend, in order to access images uploaded in the node products service
       ports:
         - "3000:80"  # Maps localhost:3000 to the nginx container's port 80
       networks:
-        - eshop-network  # Same network as the backend services to communicate internally
+        - eshop-network  # Same network as the backend services to communicate internally if we want.
 
 
 volumes:
-  products-db-data:
-  orders-db-data:
+  products-db-data: # Volume for storing products database
+  orders-db-data: # Volume for storing orders database
+  images-data: # Define the shared volume for images.
+  #By this shared volume(images-data),images uploaded in the products-service at /app/images
+  #will be visible in frontend at /usr/share/nginx/html/images folder!
+  #Note also that this `images` folder contains also the initial product images due to COPY command in Dockerfile!Its not mounted, its copied!
 
 networks:
   eshop-network:

@@ -567,6 +567,9 @@ class UI {
             if ( ! productFormEditMode){
                 try{
                     await this.addNewProduct();
+                    this.resetProductForm(); // reset the form after the new insertion.
+                    //reset the page to view changes:
+                    location.reload();
                 } catch{
                     console.error('Error at product Insertion');
                 }
