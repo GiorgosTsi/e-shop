@@ -55,7 +55,7 @@ services:
       PGPASSWORD: admin
       PGDATABASE: products
       PGPORT: 5432
-      PORT: 5000
+      PORT: 5000  # port to listen.Its the internal container's port
     command: sh -c "npm install && node app.js"  # Install dependencies and start the app
     ports:
       - "5000:5000"  # Expose Node.js app on host's port 5000
@@ -79,7 +79,7 @@ services:
       PGPASSWORD: admin
       PGDATABASE: orders
       PGPORT: 5432
-      PORT: 5000
+      PORT: 5000 # port to listen.Its the internal container's port
     command: sh -c "npm install && node app.js"  # Install dependencies and start the app
     ports:
       - "5001:5000"  # Expose Node.js app on host's port 5001

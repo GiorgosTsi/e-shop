@@ -451,8 +451,8 @@ class UI {
                     if (productImage) {
                         const formData = new FormData();
                         formData.append('image', productImage);
-
-                        const uploadResponse = await fetch('http://localhost:5000/upload-image', {
+                        
+                        const uploadResponse = await fetch(`${window.config.productsServiceHost}:${window.config.productsServicePort}/upload-image`, {
                             method: 'POST',
                             body: formData
                         });
@@ -522,6 +522,8 @@ class UI {
         * Also declares event listeners.
         */
         
+        console.log(`${window.config.productsServiceHost}:${window.config.productsServicePort}`);
+        console.log(`${window.config.ordersServiceHost}:${window.config.ordersServicePort}`);
 
         /* add event listener to the shop now hero button */
         bannerBtn.addEventListener('click', (e) => {
@@ -871,7 +873,7 @@ class UI {
         
          try {
              // First, upload the image to the backend using the image upload endpoint
-             const uploadResponse = await fetch('http://localhost:5000/upload-image', {
+             const uploadResponse = await fetch(`${window.config.productsServiceHost}:${window.config.productsServicePort}/upload-image`, {
                  method: 'POST',
                  body: formData
              });

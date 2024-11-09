@@ -2,7 +2,7 @@ export class Orders{
 
     static async getAllOrders(){
         try {
-            const response = await fetch('http://localhost:5001/orders');
+            const response = await fetch(`${window.config.ordersServiceHost}:${window.config.ordersServicePort}/orders`);
             let orders = await response.json();
             return orders; //Beware that total_price of each order is in string format due to PSql representaion of numeric.
         } catch(error) {
@@ -13,7 +13,7 @@ export class Orders{
 
     static async insertOrder(order){
         try {
-            const response = await fetch('http://localhost:5001/orders', {  
+            const response = await fetch(`${window.config.ordersServiceHost}:${window.config.ordersServicePort}/orders`, {  
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(order)

@@ -5,7 +5,7 @@ export class Products{
     static async getProducts(){
         try{
             //let result= await fetch('products2.json');
-            let result = await fetch('http://localhost:5000/products'); // by default it's a GET request
+            let result = await fetch(`${window.config.productsServiceHost}:${window.config.productsServicePort}/products`); // by default it's a GET request
             let products = await result.json();
            
             //let products = data.items; // get the products list of json object // doesnt need anymore on real fetch call
@@ -27,7 +27,7 @@ export class Products{
         // Insert the product into the database
         // `productData` should be a json object!
         try{
-            const response = await fetch('http://localhost:5000/products', {
+            const response = await fetch(`${window.config.productsServiceHost}:${window.config.productsServicePort}/products`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -47,7 +47,7 @@ export class Products{
     static async deleteProduct(productId){
 
         try{
-            await fetch(`http://localhost:5000/products/${productId}`, {
+            await fetch(`${window.config.productsServiceHost}:${window.config.productsServicePort}/products/${productId}`, {
                 method: 'DELETE'
             });
 
@@ -59,7 +59,7 @@ export class Products{
     static async updateProduct(id , updatedProductData){
 
         try{
-            await fetch(`http://localhost:5000/products/${id}`, {
+            await fetch(`${window.config.productsServiceHost}:${window.config.productsServicePort}/products/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
