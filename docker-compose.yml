@@ -1,5 +1,6 @@
 version: '3.8'
 
+## USE docker compose up --build to build and run.
 ## USE docker compose down -v to remove and reset any volume-network(reset your db)
 
 

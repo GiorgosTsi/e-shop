@@ -607,7 +607,15 @@ class UI {
         //add evemt listener to close sidebar btn
         closeSidebarBtn.addEventListener('click',this.hideSidebar);
         //add event listener to search button in navbar
-        searchBtn.addEventListener('click', this.showSearchBar);
+        searchBtn.addEventListener('click', (event) => {
+            const prodTitle = searchBar.value.trim();  // Get the value from the search bar
+            if (prodTitle) {  // Check if there's any input to search for
+                this.searchProducts(prodTitle); // Call the search function with the input
+                this.hideSearchBar(); // Hide the search bar after search
+            } else {
+                this.showSearchBar(); // Show the search bar if it’s empty
+            }
+        });
         //add event listener when enter is pressed in search bar
         searchBar.addEventListener('keydown', (event) => {
             if (event.key === 'Enter') { // Check if the Enter key was pressed

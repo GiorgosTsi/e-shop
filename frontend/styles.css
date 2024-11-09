@@ -73,21 +73,25 @@ body.no-scroll {
     margin-right: 15px;
 }
 
-.menu-icon,
-.search-icon {
+.menu-icon{
     order: 1;
 }
 
+.search-icon {
+  order: 3;
+}
+
 #store-logo {
-    order: 2;
+    order: 4;
     margin: 0 auto;
 }
 
 .cart-btn {
-    order: 3;
+    order: 5;
 }
 
 .search-bar {
+  order: 2;
   display: none; /* Hidden by default */
   padding: 8px;
   font-size: 16px;

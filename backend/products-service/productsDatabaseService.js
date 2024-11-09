@@ -68,7 +68,11 @@ class DbService {
                     ('Lenovo ThinkPad', 890.00, './images/prod5.png', 10),
                     ('HP ProBook', 1000.00, './images/prod6.jpg', 10),
                     ('MSI noteBook', 1399.99, './images/prod7.jpg', 10),
-                    ('MSI gaming laptop', 2000.00, './images/prod8.jpg', 10);
+                    ('MSI gaming laptop', 2000.00, './images/prod8.jpg', 10),
+                    ('Asus ZenBook', 950.00, './images/prod9.jpeg', 5),
+                    ('Lenovo Gaming', 1560.55, './images/prod10.jpeg', 15),
+                    ('Asus TUF', 1200.00, './images/prod11.jpeg', 20),
+                    ('Huawei Matebook', 849.99, './images/prod12.jpeg', 30);
                 `;
                 await client.query(insertProductsQuery);
                 console.log("Initial products added to the database!");
