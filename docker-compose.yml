@@ -50,7 +50,9 @@ services:
     environment:
       # Environment variables that Node.js app uses to connect to the database
       # Within Docker, products_service can reach products_db on the internal Docker network via products_db:5432.Not with localhost request.
-      PGHOST: products_db  # Use the Docker service name to connect within the network , or use localhost to do egress networking
+      # If you specify localhost as PGHOST then it will not work , because the Node.js app within 
+      # the container will try to connect to itself at localhost:5432, not the products_db container.
+      PGHOST: products_db  # Use the Docker service name to connect within the network 
       PGUSER: admin
       PGPASSWORD: admin
       PGDATABASE: products
