@@ -89,6 +89,30 @@ export class Login {
         }).join('')); // Decode Base64 and handle URI component encoding
       
         return JSON.parse(jsonPayload);
-      }
+    }
+
+    static logout(){
+
+        const realm_name = 'eshop';
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+
+        const urlencoded = new URLSearchParams();
+        urlencoded.append("refresh_token", localStorage.getItem('refresh_token'));
+        urlencoded.append("client_id", "frontend-client");
+
+        const requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: urlencoded,
+        redirect: "follow"
+        };
+
+        fetch(`${window.config.keycloakHost}:${window.config.keycloakPort}/realms/${realm_name}/protocol/openid-connect/logout`, requestOptions)
+        .then((response) => response.text())
+        .then((result) => console.log(result))
+        .catch((error) => console.error(error));
+        
+    }
     
 }

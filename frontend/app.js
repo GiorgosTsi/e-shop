@@ -33,6 +33,7 @@ const submitButton = addProductForm.querySelector('button');
 const manageProductsLink = document.querySelector(".sidebar-menu li a[href='#Manage-Products']");
 const productsLink = document.querySelector(".sidebar-menu li a[href='#Products']");
 const logsigninLink = document.querySelector(".sidebar-menu li a[href='#LogSignIn']");
+const logoutLink = document.querySelector(".sidebar-menu li a[href='#Logout']");
 const productList = document.getElementById('productList');
 const ordersLink = document.querySelector(".sidebar-menu li a[href='#Orders']");
 const ordersOverlay = document.querySelector('.orders-overlay');
@@ -548,8 +549,29 @@ class UI {
 
         logsigninLink.addEventListener("click", (event)=> {
             event.preventDefault(); // Prevent the default anchor link behavior
-            Login.logSignIn();
+
+            if (localStorage.getItem("access_token")) {
+                alert('You are already loged in!');
+            } else {
+                Login.logSignIn();
+            }
         
+        });
+
+        logoutLink.addEventListener("click", (event)=> {
+            event.preventDefault(); // Prevent the default anchor link behavior
+
+            if (localStorage.getItem("access_token")) {
+                Login.logout();
+                //delete localstorage variables for tokens
+                localStorage.removeItem('code');
+                localStorage.removeItem('id_token');
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('refresh_token');
+                
+            } else {
+                alert('You are already loged out!');
+            }
         });
         
     
