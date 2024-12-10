@@ -1,6 +1,7 @@
 import {Storage} from './Storage.js';
 import {Products} from './Products.js';
 import {Orders} from './Orders.js';
+import {Login} from './Login.js';
 
 // Global variables
 const searchBtn = document.querySelector('.search-icon');
@@ -31,6 +32,7 @@ const addProductForm = document.getElementById('addProductForm');
 const submitButton = addProductForm.querySelector('button');
 const manageProductsLink = document.querySelector(".sidebar-menu li a[href='#Manage-Products']");
 const productsLink = document.querySelector(".sidebar-menu li a[href='#Products']");
+const logsigninLink = document.querySelector(".sidebar-menu li a[href='#LogSignIn']");
 const productList = document.getElementById('productList');
 const ordersLink = document.querySelector(".sidebar-menu li a[href='#Orders']");
 const ordersOverlay = document.querySelector('.orders-overlay');
@@ -544,6 +546,11 @@ class UI {
             this.hideSidebar();
         });
 
+        logsigninLink.addEventListener("click", (event)=> {
+            event.preventDefault(); // Prevent the default anchor link behavior
+            Login.logSignIn();
+        
+        });
         
     
         // Show manage products panel when "Manage Products" is clicked
@@ -921,6 +928,11 @@ class UI {
 
 //event listener is activated when page is loaded(DOM loaded)
 document.addEventListener("DOMContentLoaded" , ()=>{
+
+    //We want this to be called only if user is redirected to the page after log in.So we have put a localstorage variable.Localstorage persists after redirect!
+    if (localStorage.getItem('isLoginInitiated') && localStorage.getItem('isLoginInitiated') === 'true') {
+        Login.handleRedirect();
+    }
 
     const ui = new UI();
     //const products = new Products();
