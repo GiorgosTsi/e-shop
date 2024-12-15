@@ -60,9 +60,13 @@ export class Login {
                     localStorage.setItem("id_token", result.id_token); 
 
                     console.log(Login.decodeJwt(result.access_token)); // you can see the user role from here!
-    
+                    localStorage.setItem("role" , Login.decodeJwt(result.access_token).role );
+                    localStorage.setItem("username" , Login.decodeJwt(result.access_token).name );
                     // Clear the login flag
                     localStorage.removeItem('isLoginInitiated');
+
+                    alert("Succesfull login!");
+                    location.reload();
                 })
                 .catch(error => {
                     console.error("Error exchanging token:", error);

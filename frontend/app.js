@@ -30,6 +30,7 @@ const manageProductsDOM = document.querySelector(".manage-products");
 const closeManageProductsBtn = document.querySelector(".close-manage-products");
 const addProductForm = document.getElementById('addProductForm');
 const submitButton = addProductForm.querySelector('button');
+const sidebarLoginStatus = document.getElementById("login-status");
 const manageProductsLink = document.querySelector(".sidebar-menu li a[href='#Manage-Products']");
 const productsLink = document.querySelector(".sidebar-menu li a[href='#Products']");
 const logsigninLink = document.querySelector(".sidebar-menu li a[href='#LogSignIn']");
@@ -568,6 +569,9 @@ class UI {
                 localStorage.removeItem('id_token');
                 localStorage.removeItem('access_token');
                 localStorage.removeItem('refresh_token');
+                localStorage.removeItem('role');
+                localStorage.removeItem('username');
+                location.reload();
                 
             } else {
                 alert('You are already loged out!');
@@ -954,6 +958,15 @@ document.addEventListener("DOMContentLoaded" , ()=>{
     //We want this to be called only if user is redirected to the page after log in.So we have put a localstorage variable.Localstorage persists after redirect!
     if (localStorage.getItem('isLoginInitiated') && localStorage.getItem('isLoginInitiated') === 'true') {
         Login.handleRedirect();
+    }
+
+    if (localStorage.getItem("access_token")){
+        // Update the login status message
+        sidebarLoginStatus.textContent = `You are logged in as ${localStorage.getItem('username')}`;
+        sidebarLoginStatus.style.display = "block";
+    } else {
+        sidebarLoginStatus.textContent = "";
+        sidebarLoginStatus.style.display = "none";
     }
 
     const ui = new UI();
