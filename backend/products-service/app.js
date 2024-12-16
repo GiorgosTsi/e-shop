@@ -80,8 +80,8 @@ app.get('/products', async (req, res) => {
 /* 2) Insert new product */
 app.post('/products' , (req,resp) => {
     console.log('insert request');
-    const { title , price , image , quantity } = req.body; 
-    pdb.insertNewProduct(title , price , image , quantity)
+    const { title , price , image , quantity , seller_username } = req.body; 
+    pdb.insertNewProduct(title , price , image , quantity , seller_username)
         .then(result => {
             resp.status(201).json({
                 message: "Data inserted successfully",
@@ -139,7 +139,27 @@ app.get('/products/title/:title', async (req, res) => {
 });
 
 
-/* 5) Update product's info by id */
+/* 5) Get all product of a specific seller */
+app.get('/products/username/:seller_username', async (req, res) => {
+
+    try {
+        const { seller_username } = req.params; // Get title from the route parameter.For multiword title you write in the url :Macbook%20Air%20M1.Use %20 for space encoding
+
+        const products = await pdb.getByUsername(seller_username);
+        
+        if (products) {
+            res.json({ success: true, data: products });
+        } else {
+            res.status(404).json({ success: false, message: 'Products for this seller not found' });
+        }
+    } catch (error) {
+        console.error("Error fetching products for specific seller", error);
+        res.status(500).json({ success: false, message: 'Server error occurred' });
+    }
+});
+
+
+/* 6) Update product's info by id */
 app.put('/products/:id', async (req, res) => {
     const { id } = req.params;  // Extract the product ID from the URL
     const updates = req.body;   // The fields you want to update come from the request body
@@ -177,7 +197,7 @@ app.put('/products/:id', async (req, res) => {
 });
 
 
-/* 6) Delete product by id */
+/* 7) Delete product by id */
 app.delete('/products/:id', async (req, res) => {
     console.log('Delete product route');
 

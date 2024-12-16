@@ -365,6 +365,8 @@ class UI {
 
 
     renderProductList(products){
+        /*Render products in manage Products area.Initially hidden. */
+
         productList.innerHTML = ''; // Clear the existing list
 
         products.forEach(product => {
@@ -666,10 +668,15 @@ class UI {
     
     async handleCheckout(){
         if(cart.length <= 0){
-            console.log('No products added in cart to procceed to checkout');
+            alert('No products added in cart to procceed to checkout');
             return;
         }
         
+        if(!localStorage.getItem("access_token")) {
+            alert("You have to login or sign in to procceed to checkout!");
+            return;
+        }
+
         console.log('proceed to checkout..');
         const cartItems = Storage.getCart();
             
@@ -964,6 +971,19 @@ document.addEventListener("DOMContentLoaded" , ()=>{
         // Update the login status message
         sidebarLoginStatus.textContent = `You are logged in as ${localStorage.getItem('username')}`;
         sidebarLoginStatus.style.display = "block";
+
+        //Show or disable specific links whether the user is seller or customer:
+        if(localStorage.getItem('role') === "customer"){
+            console.log('User is a customer');
+            manageProductsLink.style.display = "none";
+
+        }else{ //seller
+            console.log('User is a seller');
+            productsLink.style.display = "none";
+            ordersLink.style.display = "none";
+            manageProductsLink.style.display = "block";
+        }
+
     } else {
         sidebarLoginStatus.textContent = "";
         sidebarLoginStatus.style.display = "none";

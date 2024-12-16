@@ -41,7 +41,8 @@ class DbService {
                     title VARCHAR(255) NOT NULL, 
                     price REAL NOT NULL, 
                     image VARCHAR(255), 
-                    quantity INT NOT NULL
+                    quantity INT NOT NULL,
+                    seller_username VARCHAR(255) NOT NULL
                 );
             `;
 
@@ -60,19 +61,19 @@ class DbService {
     
                 // Insert initial data into the 'products' table
                 const insertProductsQuery = `
-                    INSERT INTO products (title, price, image, quantity) VALUES 
-                    ('Macbook Air M1', 1100.00, './images/prod1.jpeg', 1),
-                    ('Macbook Air M2', 1300.00, './images/prod2.jpg', 0),
-                    ('Macbook Air M3', 1400.00, './images/prod3.jpg', 2),
-                    ('Lenovo IdeaPad', 500.00, './images/prod4.jpg', 10),
-                    ('Lenovo ThinkPad', 890.00, './images/prod5.png', 10),
-                    ('HP ProBook', 1000.00, './images/prod6.jpg', 10),
-                    ('MSI noteBook', 1399.99, './images/prod7.jpg', 10),
-                    ('MSI gaming laptop', 2000.00, './images/prod8.jpg', 10),
-                    ('Asus ZenBook', 950.00, './images/prod9.jpeg', 5),
-                    ('Lenovo Gaming', 1560.55, './images/prod10.jpeg', 15),
-                    ('Asus TUF', 1200.00, './images/prod11.jpeg', 20),
-                    ('Huawei Matebook', 849.99, './images/prod12.jpeg', 30);
+                    INSERT INTO products (title, price, image, quantity, seller_username) VALUES 
+                    ('Macbook Air M1', 1100.00, './images/prod1.jpeg', 1 , 'admin1'),
+                    ('Macbook Air M2', 1300.00, './images/prod2.jpg', 0, 'admin1'),
+                    ('Macbook Air M3', 1400.00, './images/prod3.jpg', 2, 'admin1'),
+                    ('Lenovo IdeaPad', 500.00, './images/prod4.jpg', 10, 'admin1'),
+                    ('Lenovo ThinkPad', 890.00, './images/prod5.png', 10, 'admin1'),
+                    ('HP ProBook', 1000.00, './images/prod6.jpg', 10, 'admin1'),
+                    ('MSI noteBook', 1399.99, './images/prod7.jpg', 10, 'admin1'),
+                    ('MSI gaming laptop', 2000.00, './images/prod8.jpg', 10, 'admin1'),
+                    ('Asus ZenBook', 950.00, './images/prod9.jpeg', 5, 'admin1'),
+                    ('Lenovo Gaming', 1560.55, './images/prod10.jpeg', 15, 'admin1'),
+                    ('Asus TUF', 1200.00, './images/prod11.jpeg', 20, 'admin1'),
+                    ('Huawei Matebook', 849.99, './images/prod12.jpeg', 30, 'admin1');
                 `;
                 await client.query(insertProductsQuery);
                 console.log("Initial products added to the database!");
@@ -102,11 +103,11 @@ class DbService {
     }
 
     // 2. Insert a new record into 'products' table
-    async insertNewProduct(title , price , image , quantity) {
+    async insertNewProduct(title , price , image , quantity , seller_username) {
         try {
             const res = await client.query(
-                'INSERT INTO products (title, price , image , quantity) VALUES ($1, $2 , $3 , $4) RETURNING *',
-                [title , price , image , quantity]
+                'INSERT INTO products (title, price , image , quantity, seller_username) VALUES ($1, $2 , $3 , $4 , $5) RETURNING *',
+                [title , price , image , quantity , seller_username]
             );
             return res.rows[0];
         } catch (error) {
@@ -201,7 +202,18 @@ class DbService {
         }
     }
 
-    // Optional: close the client connection when you're done
+    // 7. Get record(s) by seller_username
+    async getByUsername(seller_username) {
+        try {
+            const res = await client.query('SELECT * FROM products WHERE seller_username = $1', [seller_username]);
+            return res.rows.length ? res.rows : null;
+        } catch (error) {
+            console.log("Error fetching products by username", error);
+            throw error;
+        }
+    }
+
+    // close the client connection when you're done
     async closeConnection() {
         try {
             await client.end();
