@@ -24,23 +24,28 @@ export class Products{
     }
 
 
-    static async getSellerProducts(seller_username){
-
-        try{
-            let result = await fetch(`${window.config.productsServiceHost}:${window.config.productsServicePort}/products/username/${seller_username}`); // by default it's a GET request
+    static async getSellerProducts(seller_username) {
+        try {
+            const result = await fetch(`${window.config.productsServiceHost}:${window.config.productsServicePort}/products/username/${seller_username}`);
             let products = await result.json();
-
-            products = products.map( item => {
-            let { id, title, price, image ,quantity } = item;
-            id = id.toString(); // convert product id from int to string so you can compare it with DOM id in the html code which is in string format!!
-            return {title,price,id,image,quantity};
+    
+            // Check if the products list is null or undefined
+            if (!products || !Array.isArray(products)) {
+                console.warn(`No products found for seller: ${seller_username}`);
+                return []; // Return an empty array to avoid errors downstream
+            }
+    
+            products = products.map(item => {
+                let { id, title, price, image, quantity } = item;
+                id = id.toString(); // Convert product id from int to string to match DOM ids
+                return { title, price, id, image, quantity };
             });
-
+    
             return products;
-        } catch(error){
-            console.error(error); // if data not in json
+        } catch (error) {
+            console.error("Error fetching seller's products:", error);
+            return []; // Return an empty array in case of any errors
         }
-
     }
 
     static async insertNewProduct(productData){

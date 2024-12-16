@@ -146,12 +146,7 @@ app.get('/products/username/:seller_username', async (req, res) => {
         const { seller_username } = req.params; // Get title from the route parameter.For multiword title you write in the url :Macbook%20Air%20M1.Use %20 for space encoding
 
         const products = await pdb.getByUsername(seller_username);
-        
-        if (products) {
-            res.json({ success: true, data: products });
-        } else {
-            res.status(404).json({ success: false, message: 'Products for this seller not found' });
-        }
+        res.status(200).json(products);
     } catch (error) {
         console.error("Error fetching products for specific seller", error);
         res.status(500).json({ success: false, message: 'Server error occurred' });

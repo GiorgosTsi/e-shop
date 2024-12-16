@@ -677,6 +677,11 @@ class UI {
             return;
         }
 
+        if(localStorage.getItem("access_token") && localStorage.getItem("role") === "seller"){
+            alert("You have to be customer in order to procceed to checkout!");
+            return;
+        }
+
         console.log('proceed to checkout..');
         const cartItems = Storage.getCart();
             
@@ -967,6 +972,43 @@ document.addEventListener("DOMContentLoaded" , ()=>{
         Login.handleRedirect();
     }
 
+    
+    const ui = new UI();
+    //const products = new Products();
+
+    /*setupAPP method is used, if cart content is stored in local storage,to setup the app */
+    ui.setupAPP();
+
+
+    /*LOAD PRODUCTS EVEN IF USER IS NOT LOGED IN*/
+
+    /*If products exist in local storage, it means
+      that we have quantities modified , so we need to 
+      load this array on reload and not from the db.
+    */
+    let products = Storage.getProducts();
+    
+    if (products.length === 0) {
+        // If no products in storage, fetch from Products class (which returns a promise)
+        products = Products.getProducts();
+        products.then(products => {
+          // Store products in local storage
+          Storage.saveProducts(products);
+          ui.displayProducts(products); //display products in main page
+          //ui.renderProductList(products);//display products in manage products section
+          }).then(() => {
+              ui.cartLogic();
+          });
+  
+    } else {
+          // If products are already in local storage
+          ui.displayProducts(products);
+          //ui.renderProductList(products);
+          ui.cartLogic();
+          
+    }
+
+
     if (localStorage.getItem("access_token")){
         // Update the login status message
         sidebarLoginStatus.textContent = `You are logged in as ${localStorage.getItem('username')}`;
@@ -976,62 +1018,30 @@ document.addEventListener("DOMContentLoaded" , ()=>{
         if(localStorage.getItem('role') === "customer"){
             console.log('User is a customer');
             manageProductsLink.style.display = "none";
+            ordersLink.style.display = "block";
+            /*Load the orders from Orders DB and display them in the hidden orders panel */
+            let orders = Orders.getAllOrders();
+            orders.then(orders => {
+              console.log(orders);
+              ui.renderOrdersList(orders);
+            });
+
 
         }else{ //seller
             console.log('User is a seller');
             productsLink.style.display = "none";
-            ordersLink.style.display = "none";
             manageProductsLink.style.display = "block";
+
+            let seller_username = Login.decodeJwt(localStorage.getItem("access_token")).preferred_username;
+            let sellerProducts = Products.getSellerProducts(seller_username);
+            sellerProducts.then(sellerProds => {
+                ui.renderProductList(sellerProds);
+            });
         }
 
     } else {
         sidebarLoginStatus.textContent = "";
         sidebarLoginStatus.style.display = "none";
-    }
-
-    const ui = new UI();
-    //const products = new Products();
-
-    /*setupAPP method is used, if cart content is stored in local storage,to setup the app */
-    ui.setupAPP();
-
-    
-    /*If products exist in local storage, it means
-      that we have quantities modified , so we need to 
-      load this array on reload and not the json file.
-    */
-    let products = Storage.getProducts();
-    
-    if (products.length === 0) {
-      // If no products in storage, fetch from Products class (which returns a promise)
-      products = Products.getProducts();
-      products.then(products => {
-        // Store products in local storage
-        Storage.saveProducts(products);
-        ui.displayProducts(products); //display products in main page
-        ui.renderProductList(products);//display products in manage products section
-        }).then(() => {
-            ui.cartLogic();
-            /*Load the orders from Orders DB and display them in the hidden orders panel */
-            let orders = Orders.getAllOrders();
-            orders.then(orders => {
-                //console.log(orders);
-                ui.renderOrdersList(orders);
-            });
-        });
-
-    } else {
-        // If products are already in local storage
-        ui.displayProducts(products);
-        ui.renderProductList(products);
-        // Call methods directly without waiting for a Promise
-        ui.cartLogic();
-        /*Load the orders from Orders DB and display them in the hidden orders panel */
-        let orders = Orders.getAllOrders();
-        orders.then(orders => {
-            //console.log(orders);
-            ui.renderOrdersList(orders);
-        });
     }
 
 
