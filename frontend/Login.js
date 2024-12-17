@@ -113,9 +113,26 @@ export class Login {
         };
 
         fetch(`${window.config.keycloakHost}:${window.config.keycloakPort}/realms/${realm_name}/protocol/openid-connect/logout`, requestOptions)
-        .then((response) => response.text())
-        .then((result) => console.log(result))
-        .catch((error) => console.error(error));
+        .then(response => {
+            if (response.ok) {
+                // Clear local storage variables
+                localStorage.removeItem('code');
+                localStorage.removeItem('id_token');
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('refresh_token');
+                localStorage.removeItem('role');
+                localStorage.removeItem('username');
+                
+                // Redirect to the home page
+                window.location.href = window.config.frontend;
+
+                // After redirect, reset the URL parameters
+                window.history.replaceState({}, document.title, "/");
+            } else {
+                console.error("Logout failed:", response.statusText);
+            }
+        })
+        .catch(error => console.error("Error during logout:", error));
         
     }
     

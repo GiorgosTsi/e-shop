@@ -33,7 +33,8 @@ class OrdersDB {
                 id SERIAL PRIMARY KEY,
                 products JSONB NOT NULL,
                 total_price NUMERIC(10, 2) NOT NULL,
-                status VARCHAR(10) DEFAULT 'Pending'
+                status VARCHAR(10) DEFAULT 'Pending',
+                username VARCHAR(255) NOT NULL
             );
         `;
         try {
@@ -45,17 +46,17 @@ class OrdersDB {
     }
 
     // Insert a new order
-    async insertOrder(products, totalPrice , status) {
+    async insertOrder(products, totalPrice , status , username) {
         const insertQuery = `
-            INSERT INTO orders (products, total_price, status)
-            VALUES ($1, $2, $3) RETURNING *;
+            INSERT INTO orders (products, total_price, status , username)
+            VALUES ($1, $2, $3 , $4) RETURNING *;
         `;
         try {
             if(!status){
                 status = 'Pending';
             }
             // Ensure products is properly formatted as JSON because its initially js object
-            const result = await client.query(insertQuery, [JSON.stringify(products), totalPrice, status]);
+            const result = await client.query(insertQuery, [JSON.stringify(products), totalPrice, status, username]);
             return result.rows[0];
         } catch (error) {
             console.error('Error inserting order:', error);
@@ -83,6 +84,18 @@ class OrdersDB {
             return result.rows;
         } catch (error) {
             console.error('Error fetching orders:', error);
+            throw error;
+        }
+    }
+
+    // Get all orders for a specific username
+    async getAllOrdersByUsername(username) {
+        const selectQuery = `SELECT * FROM orders where username = $1;`;
+        try {
+            const result = await client.query(selectQuery , [username]);
+            return result.rows;
+        } catch (error) {
+            console.error('Error fetching orders by username:', error);
             throw error;
         }
     }

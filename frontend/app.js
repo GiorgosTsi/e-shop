@@ -566,14 +566,6 @@ class UI {
 
             if (localStorage.getItem("access_token")) {
                 Login.logout();
-                //delete localstorage variables for tokens
-                localStorage.removeItem('code');
-                localStorage.removeItem('id_token');
-                localStorage.removeItem('access_token');
-                localStorage.removeItem('refresh_token');
-                localStorage.removeItem('role');
-                localStorage.removeItem('username');
-                location.reload();
                 
             } else {
                 alert('You are already loged out!');
@@ -688,7 +680,7 @@ class UI {
         /* Now we need to construct the order object:
                
             Order object contains: 
-            { products: [list of products] , total_price : price}
+            { products: [list of products] , total_price : price , username: customer_username}
         */
         const total_price = parseFloat(cartTotal.innerHTML);
 
@@ -697,8 +689,9 @@ class UI {
         amount: item.amount,
         product_id: parseInt(item.id)
         }));
-            
-        const order = { products , total_price}; //JS object. To be stringified in order to passed as request body.
+        
+        const username = Login.decodeJwt(localStorage.getItem("access_token")).preferred_username;
+        const order = { products , total_price , username}; //JS object. To be stringified in order to passed as request body.
 
         try {
             const response = await Orders.insertOrder(order); // Await the promise result
@@ -995,7 +988,6 @@ document.addEventListener("DOMContentLoaded" , ()=>{
           // Store products in local storage
           Storage.saveProducts(products);
           ui.displayProducts(products); //display products in main page
-          //ui.renderProductList(products);//display products in manage products section
           }).then(() => {
               ui.cartLogic();
           });
@@ -1003,7 +995,6 @@ document.addEventListener("DOMContentLoaded" , ()=>{
     } else {
           // If products are already in local storage
           ui.displayProducts(products);
-          //ui.renderProductList(products);
           ui.cartLogic();
           
     }
@@ -1014,6 +1005,10 @@ document.addEventListener("DOMContentLoaded" , ()=>{
         sidebarLoginStatus.textContent = `You are logged in as ${localStorage.getItem('username')}`;
         sidebarLoginStatus.style.display = "block";
 
+        // Show the logout button , and hide the login button
+        logoutLink.style.display = "block";
+        logsigninLink.style.display = "none";
+
         //Show or disable specific links whether the user is seller or customer:
         if(localStorage.getItem('role') === "customer"){
             console.log('User is a customer');
@@ -1021,7 +1016,8 @@ document.addEventListener("DOMContentLoaded" , ()=>{
             ordersLink.style.display = "block";
             /*Load the orders from Orders DB and display them in the hidden orders panel */
             let orders = Orders.getAllOrders();
-            orders.then(orders => {
+            let ordersByUser = Orders.getAllOrdersByUsername(Login.decodeJwt(localStorage.getItem("access_token")).preferred_username);
+            ordersByUser.then(orders => {
               console.log(orders);
               ui.renderOrdersList(orders);
             });

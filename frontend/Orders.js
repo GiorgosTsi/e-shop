@@ -11,6 +11,17 @@ export class Orders{
     }
 
 
+    static async getAllOrdersByUsername(username){
+        try {
+            const response = await fetch(`${window.config.ordersServiceHost}:${window.config.ordersServicePort}/orders/${username}`);
+            let orders = await response.json();
+            return orders; //Beware that total_price of each order is in string format due to PSql representaion of numeric.
+        } catch(error) {
+            console.error('Fetching all orders error ' ,error);
+        }
+    }
+
+
     static async insertOrder(order){
         try {
             const response = await fetch(`${window.config.ordersServiceHost}:${window.config.ordersServicePort}/orders`, {  

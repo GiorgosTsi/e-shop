@@ -48,7 +48,7 @@ app.get('/orders', async (req, res) => {
 app.post('/orders' , async (req,res) => {
     console.log('insert new order');
     
-    const { products, total_price , status } = req.body;
+    const { products, total_price , status , username } = req.body;
     // due to the express.json middleware , json is automatically transformed to js object
     console.log(products);
     console.log(typeof products);
@@ -61,13 +61,27 @@ app.post('/orders' , async (req,res) => {
 
     try {
         // Insert the order into the database
-        const newOrder = await odb.insertOrder(products, total_price , status);
+        const newOrder = await odb.insertOrder(products, total_price , status , username);
         // Respond with the newly created order details
         res.status(201).json({ success: true, message: 'Order created successfully', order: newOrder });
         console.log('Order inserted succesfully!');
     } catch (error) {
         console.error('Error creating order:', error);
         res.status(500).json({ success: false, message: 'Error creating order', error: error.message });
+    }
+});
+
+/* 3) Get all orders for a user */
+app.get('/orders/:username', async (req, res) => {
+    
+    try {
+        const { username } = req.params; // Get username from the route parameter
+        
+        const orders = await odb.getAllOrdersByUsername(username);
+        res.status(200).json(orders); 
+        
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to retrieve data' });
     }
 });
 
