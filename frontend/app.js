@@ -700,9 +700,11 @@ class UI {
 
             if (responseData.success) {
                 console.log('Order placed successfully');
-                //this.clearCart(); // Optional: Clear the cart if the order is successful
+                this.clearCartAfterSuccessOrder(); // Clear the cart if the order is successful
                 //add order to the OrdersList section
                 this.appendOrderList(responseData.order);
+                location.reload();
+
                 
             } else {
                 console.log('Order placement failed:', responseData.message);
@@ -840,6 +842,47 @@ class UI {
         cartItems.forEach( itemID => {
             this.removeCartItem(itemID);
         });
+    }
+
+    clearCartAfterSuccessOrder(){
+        let cartItems = cart.map( item => item.id);
+        cartItems.forEach( itemID => {
+            this.clearCartItemAfterSuccessOrder(itemID);
+        });
+    }
+
+    clearCartItemAfterSuccessOrder(id){
+
+        /*1) Remove item from the cart */
+        cart = cart.filter( item => item.id !== id); // keep only the items that satisfy the predicate
+        
+        /*2) Remove also the item from cart Content DOM */
+        
+        // Find the item element in the cartContent DOM by data-id
+        //Note that the cart-item is the grandparent of the item with the given data-id
+        //so we need to climb up two parent nodes and delete this item, to delete the item from the DOM
+        const itemElement = cartContent.querySelector(`[data-id="${id}"]`);
+        
+        if (itemElement) {
+            // Traverse up to the grandparent (parent of parent)
+            const parentElement = itemElement.parentElement.parentElement;
+    
+            // Remove the parent element from cartContent
+            cartContent.removeChild(parentElement);
+        } else {
+            console.log(`Item with id ${id} not found in cartContent`);
+        }
+
+        /*3) Store the new cart list in local storage: */
+        Storage.saveCart(cart);
+
+        /*4) Reset the add to cart button of this item: */
+
+        let button = this.getSingleButton(id);
+        if( button ){
+            button.disabled = false;
+            button.innerHTML = `<i class="fa fa-shopping-cart"></i>add to cart`;
+        }
     }
 
     removeCartItem(id){

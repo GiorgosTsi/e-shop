@@ -35,6 +35,7 @@ const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
 const dotenv = require('dotenv');
+const kafka = require('./kafka'); //initialize kafka consumer
 dotenv.config();
 
 const app = express(); //initialize the app

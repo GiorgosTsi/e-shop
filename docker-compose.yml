@@ -179,6 +179,63 @@ services:
     networks:
       - keycloak-and-mysql-network
 
+# zookeeper for managing configurations of kafka broker
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.2.1
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    networks:
+      - eshop-network
+      - kafka
+
+# kafka broker system
+  kafka:
+    image: confluentinc/cp-kafka:7.2.1
+    container_name: kafka
+    ports:
+      - "8097:8097"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: EXTERNAL:PLAINTEXT,INTERNAL:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: EXTERNAL://localhost:8097,INTERNAL://kafka:19092
+      KAFKA_LISTENERS: EXTERNAL://:8097,INTERNAL://:19092
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    networks:
+      - eshop-network
+      - kafka
+    restart: on-failure
+    healthcheck:
+      test: ["CMD", "nc", "-z", "127.0.0.1", "8097"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+
+# monitoring tool for kafka
+  control-center:
+    image: confluentinc/cp-enterprise-control-center:latest
+    hostname: control-center
+    depends_on:
+      - kafka
+    ports:
+      - "9021:9021"
+    expose:
+      - 9021
+    environment:
+      CONTROL_CENTER_BOOTSTRAP_SERVERS: "kafka:19092"
+      CONTROL_CENTER_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      CONTROL_CENTER_REPLICATION_FACTOR: 1
+      PORT: 9021
+    networks:
+      - eshop-network
+      - kafka
+    restart: always
 
 volumes:
   products-db-data: # Volume for storing products database
@@ -194,3 +251,4 @@ networks:
   eshop-network:
     driver: bridge
   keycloak-and-mysql-network:
+  kafka:

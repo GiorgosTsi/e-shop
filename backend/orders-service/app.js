@@ -19,6 +19,7 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const kafka = require('./kafka'); 
 dotenv.config();
 
 const app = express(); //initialize the app
@@ -62,6 +63,15 @@ app.post('/orders' , async (req,res) => {
     try {
         // Insert the order into the database
         const newOrder = await odb.insertOrder(products, total_price , status , username);
+
+        // Send msg to kafka topic
+        const msg = {
+            id: newOrder.id, // Correctly extract the order ID
+            products: products // Extract products array
+        }
+    
+        await kafka.kafkaProducer(msg)
+        
         // Respond with the newly created order details
         res.status(201).json({ success: true, message: 'Order created successfully', order: newOrder });
         console.log('Order inserted succesfully!');

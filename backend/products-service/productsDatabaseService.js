@@ -148,7 +148,7 @@ class DbService {
                 updateFields.push('price = $' + (values.length + 1));
                 values.push(price);
             }
-            if (quantity) {
+            if (quantity !== null) {
                 updateFields.push('quantity = $' + (values.length + 1));
                 values.push(quantity);
             }
@@ -212,6 +212,45 @@ class DbService {
             throw error;
         }
     }
+
+    // 8. Check product quantities for an order and update them if possible
+    async checkAndProcessOrder(order) {
+        try {
+            // Extract the products array from the order
+            const { products } = order;
+
+            // Iterate over each product in the order
+            for (const item of products) {
+                const { product_id, amount } = item;
+
+                // Fetch the current quantity of the product from the database
+                const product = await this.getById(product_id);
+
+                if (!product) {
+                    console.log(`Product with ID ${product_id} not found.`);
+                    return false; // Product doesn't exist
+                }
+
+                if (product.quantity < amount) {
+                    console.log(`Insufficient stock for product ID ${product_id}. Requested: ${amount}, Available: ${product.quantity}`);
+                    return false; // Not enough quantity
+                }
+
+                // Calculate the new quantity and update the database
+                const newQuantity = product.quantity - amount;
+                console.log('newQuantity is ', newQuantity);
+                await this.updateProduct(product_id, { quantity: newQuantity });
+            }
+
+            // If all products were successfully updated, return true
+            console.log("Order processed successfully.");
+            return true;
+        } catch (error) {
+            console.error("Error processing order", error);
+            throw error; // Re-throw error to be handled by calling function
+        }
+    }
+
 
     // close the client connection when you're done
     async closeConnection() {
