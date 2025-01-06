@@ -1,9 +1,9 @@
 window.config = {
-    productsServiceHost: 'http://localhost',
+    productsServiceHost: 'http://34.154.60.173',
     productsServicePort: '5000' ,
-    ordersServiceHost: 'http://localhost',
+    ordersServiceHost: 'http://34.154.60.173',
     ordersServicePort: '5001' ,
-    keycloakHost: 'http://localhost', // with 127.0.0.1 we get cookie error in keycloak login!
+    keycloakHost: 'http://34.154.60.173', // with 127.0.0.1 we get cookie error in keycloak login!
     keycloakPort: '8182' ,
-    frontend : "http://127.0.0.1:3000"
+    frontend : "http://34.154.60.173:3000"
 };
