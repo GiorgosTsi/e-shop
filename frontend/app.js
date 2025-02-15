@@ -393,14 +393,14 @@ class UI {
         });
     }
 
-    handleDeleteProduct(id){
+    async handleDeleteProduct(id){
         /*1) Remove product from the cart of customer , if exists: */
         let exists = cart.filter(prod => prod.id === id);
         if(exists.length){
             this.removeCartItem(id);
         }
         /*2) Delete product from backend DB */
-        Products.deleteProduct(id);
+        await Products.deleteProduct(id);
 
         /*3) Remove the deleted product from products Local Storage */
         let prods = Storage.getProducts();
@@ -411,11 +411,16 @@ class UI {
         this.displayProducts(prods);
 
         /*5) Remove also the product from manage products section */
-        this.renderProductList(prods);
+        let seller_username = localStorage.getItem("username");
+        let sellerProducts = await Products.getSellerProducts(seller_username);
+        this.renderProductList(sellerProducts);
+
+        //reset the page to view changes:
+        location.reload();
 
     }
 
-    handleEditProduct(product){
+    async handleEditProduct(product){
         console.log('On handle edit prod' + product);
         // Pre-fill the form fields with the product details
         document.getElementById('productTitle').value = product.title;
@@ -498,8 +503,10 @@ class UI {
                         this.setCartValues(cart); // Recalculate totals
                         Storage.saveCart(cart);
                     }
+                    let seller_username = localStorage.getItem("username");
+                    let sellerProducts = await Products.getSellerProducts(seller_username);
+                    this.renderProductList(sellerProducts);
 
-                    this.renderProductList(storedProducts); // Re-render the updated list
                     this.displayProducts(storedProducts);
 
                     this.resetProductForm();
@@ -885,7 +892,7 @@ class UI {
         }
     }
 
-    removeCartItem(id){
+    async removeCartItem(id){
         let productAmountToRemove = cart.filter( item => item.id === id)[0].amount;
 
         /*1) Remove item from the cart */
@@ -928,7 +935,7 @@ class UI {
 
         /*7) Reset the info about the product in manage products section: */
         this.renderProductList(Storage.getProducts());
-
+        
     }
 
     getSingleButton(id){
@@ -971,8 +978,10 @@ class UI {
                  title: productTitle,
                  price: productPrice,
                  image: imagePath, // Use the path of the uploaded image
-                 quantity: productQuantity
+                 quantity: productQuantity ,
+                 seller_username : localStorage.getItem("username")
              };
+
              console.log(productData);
              const result = await Products.insertNewProduct(productData);
 
@@ -987,7 +996,9 @@ class UI {
              this.displayProducts(prods);
 
              //re render the products in the edit panel
-             this.renderProductList(prods);
+             let seller_username = localStorage.getItem("username");
+             let sellerProducts = await Products.getSellerProducts(seller_username);
+             this.renderProductList(sellerProducts);
 
 
          } catch (error) {
@@ -1071,7 +1082,7 @@ document.addEventListener("DOMContentLoaded" , ()=>{
             productsLink.style.display = "none";
             manageProductsLink.style.display = "block";
 
-            let seller_username = Login.decodeJwt(localStorage.getItem("access_token")).preferred_username;
+            let seller_username = localStorage.getItem("username");
             let sellerProducts = Products.getSellerProducts(seller_username);
             sellerProducts.then(sellerProds => {
                 ui.renderProductList(sellerProds);

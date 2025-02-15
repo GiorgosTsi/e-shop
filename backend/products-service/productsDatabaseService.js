@@ -62,18 +62,18 @@ class DbService {
                 // Insert initial data into the 'products' table
                 const insertProductsQuery = `
                     INSERT INTO products (title, price, image, quantity, seller_username) VALUES 
-                    ('Macbook Air M1', 1100.00, './images/prod1.jpeg', 1 , 'admin2'),
-                    ('Macbook Air M2', 1300.00, './images/prod2.jpg', 0, 'admin2'),
-                    ('Macbook Air M3', 1400.00, './images/prod3.jpg', 2, 'admin2'),
-                    ('Lenovo IdeaPad', 500.00, './images/prod4.jpg', 10, 'admin2'),
-                    ('Lenovo ThinkPad', 890.00, './images/prod5.png', 10, 'admin2'),
-                    ('HP ProBook', 1000.00, './images/prod6.jpg', 10, 'admin2'),
-                    ('MSI noteBook', 1399.99, './images/prod7.jpg', 10, 'admin2'),
-                    ('MSI gaming laptop', 2000.00, './images/prod8.jpg', 10, 'admin2'),
-                    ('Asus ZenBook', 950.00, './images/prod9.jpeg', 5, 'admin2'),
-                    ('Lenovo Gaming', 1560.55, './images/prod10.jpeg', 15, 'admin2'),
-                    ('Asus TUF', 1200.00, './images/prod11.jpeg', 20, 'admin2'),
-                    ('Huawei Matebook', 849.99, './images/prod12.jpeg', 30, 'admin2');
+                    ('Macbook Air M1', 1100.00, './images/prod1.jpeg', 1 , 'giwrghs tsik'),
+                    ('Macbook Air M2', 1300.00, './images/prod2.jpg', 0, 'giwrghs tsik'),
+                    ('Macbook Air M3', 1400.00, './images/prod3.jpg', 2, 'giwrghs tsik'),
+                    ('Lenovo IdeaPad', 500.00, './images/prod4.jpg', 10, 'giwrghs tsik'),
+                    ('Lenovo ThinkPad', 890.00, './images/prod5.png', 10, 'giwrghs tsik'),
+                    ('HP ProBook', 1000.00, './images/prod6.jpg', 10, 'giwrghs tsik'),
+                    ('MSI noteBook', 1399.99, './images/prod7.jpg', 10, 'giwrghs tsik'),
+                    ('MSI gaming laptop', 2000.00, './images/prod8.jpg', 10, 'giwrghs tsik'),
+                    ('Asus ZenBook', 950.00, './images/prod9.jpeg', 5, 'giwrghs tsik'),
+                    ('Lenovo Gaming', 1560.55, './images/prod10.jpeg', 15, 'giwrghs tsik'),
+                    ('Asus TUF', 1200.00, './images/prod11.jpeg', 20, 'giwrghs tsik'),
+                    ('Huawei Matebook', 849.99, './images/prod12.jpeg', 30, 'giwrghs tsik');
                 `;
                 await client.query(insertProductsQuery);
                 console.log("Initial products added to the database!");

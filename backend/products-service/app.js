@@ -45,12 +45,13 @@ app.use(cors());
 // Define storage for images using multer
 const storage = multer.diskStorage({
     destination: path.join(__dirname, 'images'),  // Save to the shared volume path
-    // destination: path.join(__dirname, '../../frontend/images'),  // This path is only for local run of the Project.If dockerized do the above.
     filename: (req, file, cb) => {
-        // Create a unique filename by adding a timestamp
-        cb(null, `${Date.now()}-${file.originalname}`);
+      // Remove all spaces from the original filename
+      const originalNameWithoutSpaces = file.originalname.replace(/\s+/g, '');
+      // Create a unique filename by adding a timestamp
+      cb(null, `${Date.now()}-${originalNameWithoutSpaces}`);
     }
-});
+  });
 
 // Initialize multer middleware with the storage configuration
 const upload = multer({ storage: storage });
